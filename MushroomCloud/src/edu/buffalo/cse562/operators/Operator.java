@@ -1,5 +1,7 @@
 package edu.buffalo.cse562.operators;
 
+import java.util.Map;
+
 import net.sf.jsqlparser.expression.LeafValue;
 import edu.buffalo.cse562.schema.Schema;
 
@@ -17,5 +19,7 @@ public interface Operator {
 	
 	public void setLeft(Operator o);
 	public void setRight(Operator o);
+	
+	public Map<String, Object> getDetails();
 	
 }

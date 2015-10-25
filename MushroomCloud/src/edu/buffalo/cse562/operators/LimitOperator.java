@@ -1,5 +1,10 @@
 package edu.buffalo.cse562.operators;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.sf.jsqlparser.expression.LeafValue;
 import edu.buffalo.cse562.schema.Schema;
 
@@ -114,6 +119,19 @@ public class LimitOperator implements Operator {
 	@Override
 	public void setRight(Operator o) {
 
+	}
+
+	@Override
+	public Map<String, Object> getDetails() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Object> expList = new ArrayList<Object>();
+		List<Object> srcs = new ArrayList<Object>();
+		srcs.add(child.getDetails());
+		expList.add(limit + "");
+		map.put("TYPE", "LIMIT");
+		map.put("EXPRESSION", expList);
+		map.put("SRC", srcs);
+		return map;
 	}
 
 }

@@ -1,9 +1,11 @@
 package edu.buffalo.cse562.operators;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import edu.buffalo.cse562.Eval;
 import edu.buffalo.cse562.schema.ColumnInfo;
@@ -337,6 +339,20 @@ public class ProjectionOperator extends Eval implements Operator {
 	
 	public List<SelectItem> getSelectItems() {
 		return selectItems;
+	}
+
+	@Override
+	public Map<String, Object> getDetails() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Object> expList = new ArrayList<Object>();
+		for(SelectItem item : selectItems)
+			expList.add(item.toString());
+		List<Object> srcs = new ArrayList<Object>();
+		srcs.add(child.getDetails());
+		map.put("TYPE", "PROJECT");
+		map.put("EXPRESSION", expList);
+		map.put("SRC", srcs);
+		return map;
 	}
 	
 }

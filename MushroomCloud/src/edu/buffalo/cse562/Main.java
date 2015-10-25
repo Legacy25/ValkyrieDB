@@ -17,6 +17,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
+import org.json.JSONObject;
+
 import edu.buffalo.cse562.operators.Operator;
 
 public class Main {	
@@ -75,6 +77,12 @@ public class Main {
 	 * -q Quiet mode
 	 */
 	public static boolean QUIET = false;
+	
+	/*
+	 * Execute mode, either dumps a representation of the query plan 
+	 * or executes the query
+	 */
+	public static boolean EXECUTE = false;
 	
 	public static void main(String[] args) {
 		
@@ -186,26 +194,33 @@ public class Main {
 		
 		long totalGenerateTime = System.nanoTime();
 		
-		/* Now evaluate each parse-tree */
-		for(int i=0; i< parseTreeList.size(); i++) {
-			long localStart = System.nanoTime();
-			
-			if(parseTreeList.get(i) != null) {
-				if(FILE_OUTPUT) {
-					ParseTreeEvaluator.output(
-							parseTreeList.get(i), 
-							new File(
-									FILE_OUTPUT_DIR,
-									sqlFiles.get(i).getName().split(".sql")[0] + ".out"
-									)
-							);
-				} else {
-					ParseTreeEvaluator.output(parseTreeList.get(i));
+		if(Main.EXECUTE){
+			/* Now evaluate each parse-tree */
+			for(int i=0; i< parseTreeList.size(); i++) {
+				long localStart = System.nanoTime();
+				
+				if(parseTreeList.get(i) != null) {
+					if(FILE_OUTPUT) {
+						ParseTreeEvaluator.output(
+								parseTreeList.get(i), 
+								new File(
+										FILE_OUTPUT_DIR,
+										sqlFiles.get(i).getName().split(".sql")[0] + ".out"
+										)
+								);
+					} else {
+						ParseTreeEvaluator.output(parseTreeList.get(i));
+					}
 				}
+					
+				qexecTime.add((double) (System.nanoTime() - localStart)/BILLION);
 			}
-			
-			qexecTime.add((double) (System.nanoTime() - localStart)/BILLION);
+		} else {
+			for (Operator operator : parseTreeList) {
+				System.out.println(new JSONObject(operator.getDetails()));
+			}
 		}
+			
 		
 		double totalGenTime = (double) (totalGenerateTime - globalStart)/BILLION;
 		double totalExecTime = (double) (System.nanoTime() - totalGenerateTime)/BILLION;

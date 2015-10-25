@@ -5,12 +5,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.LeafValue;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.StringValue;
+import edu.buffalo.cse562.schema.ColumnWithType;
 import edu.buffalo.cse562.schema.Schema;
 
 public class ScanOperator implements Operator {
@@ -185,6 +190,19 @@ public class ScanOperator implements Operator {
 
 	public String getString() {
 		return line;
+	}
+
+	@Override
+	public Map<String, Object> getDetails() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Object> expList = new ArrayList<Object>();
+		for(ColumnWithType col : schema.getColumns())
+			expList.add(col.getColumnName() + "=" + col.getColumnType());
+		List<Object> srcs = new ArrayList<Object>();
+		map.put("TYPE", "TABLE");
+		map.put("EXPRESSION", expList);
+		map.put("SRC", srcs);
+		return map;
 	}
 
 }

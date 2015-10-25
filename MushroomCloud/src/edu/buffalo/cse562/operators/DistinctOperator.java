@@ -1,7 +1,11 @@
 package edu.buffalo.cse562.operators;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import net.sf.jsqlparser.expression.LeafValue;
 import edu.buffalo.cse562.schema.Schema;
@@ -129,6 +133,18 @@ public class DistinctOperator implements Operator {
 	@Override
 	public void setRight(Operator o) {
 		
+	}
+
+	@Override
+	public Map<String, Object> getDetails() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Object> expList = new ArrayList<Object>();
+		List<Object> srcs = new ArrayList<Object>();
+		srcs.add(child.getDetails());
+		map.put("TYPE", "DISTINCT");
+		map.put("EXPRESSION", expList);
+		map.put("SRC", srcs);
+		return map;
 	}
 
 }

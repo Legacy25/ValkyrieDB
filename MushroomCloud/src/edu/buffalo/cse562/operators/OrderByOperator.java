@@ -2,6 +2,9 @@ package edu.buffalo.cse562.operators;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import edu.buffalo.cse562.LeafValueComparator;
 import edu.buffalo.cse562.schema.Schema;
@@ -138,6 +141,20 @@ public class OrderByOperator implements Operator {
 
 	public ArrayList<OrderByElement> getArguments() {
 		return arguments;
+	}
+
+	@Override
+	public Map<String, Object> getDetails() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Object> expList = new ArrayList<Object>();
+		for(OrderByElement arg : arguments)
+			expList.add(arg.toString());
+		List<Object> srcs = new ArrayList<Object>();
+		srcs.add(child.getDetails());
+		map.put("TYPE", "ORDERBY");
+		map.put("EXPRESSION", expList);
+		map.put("SRC", srcs);
+		return map;
 	}
 
 }

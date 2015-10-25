@@ -1,5 +1,10 @@
 package edu.buffalo.cse562.operators;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.sf.jsqlparser.expression.LeafValue;
 import edu.buffalo.cse562.schema.Schema;
 
@@ -119,6 +124,20 @@ public class UnionOperator implements Operator {
 	@Override
 	public void setRight(Operator o) {
 		child2 = o;
+	}
+
+
+	@Override
+	public Map<String, Object> getDetails() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Object> expList = new ArrayList<Object>();
+		List<Object> srcs = new ArrayList<Object>();
+		srcs.add(child1.getDetails());
+		srcs.add(child2.getDetails());
+		map.put("TYPE", "UNION");
+		map.put("EXPRESSION", expList);
+		map.put("SRC", srcs);
+		return map;
 	}
 
 }

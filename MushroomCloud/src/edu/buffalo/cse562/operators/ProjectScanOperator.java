@@ -5,8 +5,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import net.sf.jsqlparser.expression.DoubleValue;
 import net.sf.jsqlparser.expression.LeafValue;
@@ -204,6 +208,19 @@ public class ProjectScanOperator implements Operator {
 
 	public HashSet<String> getSelectedColumns() {
 		return selectedColumnNames;
+	}
+
+	@Override
+	public Map<String, Object> getDetails() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Object> expList = new ArrayList<Object>();
+		for(ColumnWithType col : oldSchema.getColumns())
+			expList.add(col.getColumnName() + "=" + col.getColumnType());
+		List<Object> srcs = new ArrayList<Object>();
+		map.put("TYPE", "TABLE");
+		map.put("EXPRESSION", expList);
+		map.put("SRC", srcs);
+		return map;
 	}
 
 }

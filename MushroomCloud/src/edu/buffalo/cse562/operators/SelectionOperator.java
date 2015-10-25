@@ -3,11 +3,9 @@ package edu.buffalo.cse562.operators;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import edu.buffalo.cse562.Eval;
-import edu.buffalo.cse562.ParseTreeOptimizer;
-import edu.buffalo.cse562.schema.ColumnInfo;
-import edu.buffalo.cse562.schema.Schema;
 import net.sf.jsqlparser.expression.BooleanValue;
 import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.DoubleValue;
@@ -16,6 +14,10 @@ import net.sf.jsqlparser.expression.LeafValue;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.schema.Column;
+import edu.buffalo.cse562.Eval;
+import edu.buffalo.cse562.ParseTreeOptimizer;
+import edu.buffalo.cse562.schema.ColumnInfo;
+import edu.buffalo.cse562.schema.Schema;
 
 public class SelectionOperator extends Eval implements Operator {
 
@@ -233,6 +235,19 @@ public class SelectionOperator extends Eval implements Operator {
 	@Override
 	public void setRight(Operator o) {
 
+	}
+
+	@Override
+	public Map<String, Object> getDetails() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Object> expList = new ArrayList<Object>();
+		List<Object> srcs = new ArrayList<Object>();
+		srcs.add(child.getDetails());
+		expList.add(where.toString());
+		map.put("TYPE", "SELECT");
+		map.put("EXPRESSION", expList);
+		map.put("SRC", srcs);
+		return map;
 	}
 
 }

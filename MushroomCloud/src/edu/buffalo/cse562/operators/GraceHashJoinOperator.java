@@ -2,6 +2,8 @@ package edu.buffalo.cse562.operators;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
@@ -278,5 +280,19 @@ public class GraceHashJoinOperator implements Operator {
 	
 	public Expression getWhere() {
 		return where;
+	}
+
+	@Override
+	public Map<String, Object> getDetails() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Object> expList = new ArrayList<Object>();
+		List<Object> srcs = new ArrayList<Object>();
+		srcs.add(child1.getDetails());
+		srcs.add(child2.getDetails());
+		expList.add(where.toString());
+		map.put("TYPE", "JOIN");
+		map.put("EXPRESSION", expList);
+		map.put("SRC", srcs);
+		return map;
 	}
 }

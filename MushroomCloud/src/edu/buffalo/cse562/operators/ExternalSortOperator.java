@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import edu.buffalo.cse562.LeafValueComparator;
 import edu.buffalo.cse562.Main;
@@ -414,6 +416,20 @@ public class ExternalSortOperator implements Operator {
 	@Override
 	public void setRight(Operator o) {
 		/* Nothing to do */
+	}
+
+	@Override
+	public Map<String, Object> getDetails() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Object> expList = new ArrayList<Object>();
+		List<Object> srcs = new ArrayList<Object>();
+		for(OrderByElement arg : arguments)
+			expList.add(arg.toString());
+		srcs.add(child.getDetails());
+		map.put("TYPE", "SORT");
+		map.put("EXPRESSION", expList);
+		map.put("SRC", srcs);
+		return map;
 	}
 
 }
