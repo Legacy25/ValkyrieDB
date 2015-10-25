@@ -1,6 +1,7 @@
 package edu.buffalo.cse562;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -228,7 +229,7 @@ public class ParseTreeOptimizer {
 			ArrayList<ScanOperator> relations = 
 					findAllRelations(parseTree);
 			
-			relations.sort(new Comparator<ScanOperator>() {
+			Collections.sort(relations, new Comparator<ScanOperator>() {
 
 				@Override
 				public int compare(ScanOperator o1, ScanOperator o2) {
@@ -238,6 +239,17 @@ public class ParseTreeOptimizer {
 					return (int) diff;
 				}
 			});
+
+			/*relations.sort(new Comparator<ScanOperator>() {
+
+				@Override
+				public int compare(ScanOperator o1, ScanOperator o2) {
+					long rC1 = o1.getSchema().getRowCount();
+					long rC2 = o2.getSchema().getRowCount();
+					long diff = rC1 - rC2;
+					return (int) diff;
+				}
+			});*/
 			
 			parseTree = new CrossProductOperator(relations.get(0), relations.get(1));
 			

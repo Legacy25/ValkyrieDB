@@ -1,0 +1,2 @@
+Main-Class: edu/buffalo/cse562/Main
+Class-Path: ./jsqlparser.jar ./expression.jar ./java-json.jar

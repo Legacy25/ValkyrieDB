@@ -15,7 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.function.Consumer;
+//import java.util.function.Consumer;
 
 import org.json.JSONObject;
 
@@ -57,7 +57,7 @@ public class Main {
 	 * Mainly used to print out various debugging info
 	 * like query plans and processing times
 	 */
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 	
 	/*
 	 * --fileout flag redirects the results to files
@@ -178,14 +178,14 @@ public class Main {
 			/*
 			 * Display the query plan
 			 */
-			if(Main.DEBUG) {
+			/*if(Main.DEBUG) {
 				parseTreeList.forEach(new Consumer<Operator>() {
 					@Override
 					public void accept(Operator t) {
 						System.out.println(t.getSchema());
 					}
 				});
-			}
+			}*/
 		}
 		
 		/*
