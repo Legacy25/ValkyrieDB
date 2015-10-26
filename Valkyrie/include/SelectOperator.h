@@ -3,7 +3,7 @@
 
 #include "Operator.h"
 
-class SelectOperator : protected Operator {
+class SelectOperator : public Operator {
 public:
 	SelectOperator(std::vector<std::string> expressions, std::vector<Operator*> children);
 	void consume(Tuple tuple);

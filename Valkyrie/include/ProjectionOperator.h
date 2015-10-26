@@ -3,7 +3,7 @@
 
 #include "Operator.h"
 
-class ProjectionOperator : protected Operator {
+class ProjectionOperator : public Operator {
 public:
 	ProjectionOperator(std::vector<std::string> expressions, std::vector<Operator*> children);
 	void consume(Tuple tuple);
