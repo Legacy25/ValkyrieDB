@@ -6,10 +6,9 @@ SelectOperator::SelectOperator(std::vector<std::string> expressions, std::vector
 	this->children = children;
 }
 
-Tuple SelectOperator::produce(){
-	return NULL;
+void SelectOperator::produce(){
 }
 
-void SelectOperator::consume(Tuple tuple){
+void SelectOperator::consume(){
 
 }

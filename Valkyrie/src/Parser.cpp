@@ -3,11 +3,16 @@
 Operator* Parser::parseJson(std::string json){
 	rapidjson::Document doc;
 	doc.Parse(json.c_str());
-	Operator *root = createTree(doc);
+	Operator *tree = createTree(doc["SRC"]);
+	std::vector<Operator*> src;
+	src.push_back(tree);
+	Operator *root = new PrintOperator(std::vector<std::string>(), src);
 	return root;
 }
 
-Operator* Parser::createTree(rapidjson::Value node){
+Operator* Parser::createTree(const rapidjson::Value& node){
+	if(node == NULL)
+		return NULL;
 	std::string type = node["TYPE"].GetString();
 	std::vector<std::string> expressions;
 	const rapidjson::Value& expression = node["EXPRESSION"];
@@ -16,19 +21,18 @@ Operator* Parser::createTree(rapidjson::Value node){
 		expressions.push_back(it->GetString());
 	std::vector<Operator*> children;
 	for(rapidjson::Value::ConstValueIterator it = src.Begin(); it != src.End(); it++){
-		Operator *c = createTree(it->GetObject());
+		Operator *c = createTree(*it);
 		children.push_back(c);
 	}
 	Operator *op = NULL;
-	switch(type){
-		case "SELECT":
-			op = new SelectOperator(expressions, children);
-			break;
-		case "PROJECT":
-			op = new ProjectionOperator(expressions, children);
-			break;
-		default:
-			break;
+	if(type == "SELECT"){
+		op = new SelectOperator(expressions, children);
+	} else if(type == "PROJECT"){
+		op = new ProjectionOperator(expressions, children);
+	} else if(type == "TABLE"){
+		op = new ScanOperator(expressions, children);
+	} else if(type == "PRINT"){
+		op = new PrintOperator(expressions, children);
 	}
 	return op;
 }

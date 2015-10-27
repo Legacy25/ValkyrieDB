@@ -6,8 +6,8 @@
 class ProjectionOperator : public Operator {
 public:
 	ProjectionOperator(std::vector<std::string> expressions, std::vector<Operator*> children);
-	void consume(Tuple tuple);
-	Tuple produce();
+	void consume();
+	void produce();
 };
 
 #endif

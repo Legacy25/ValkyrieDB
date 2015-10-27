@@ -15,6 +15,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 //import java.util.function.Consumer;
 
 import org.json.JSONObject;
@@ -217,7 +219,11 @@ public class Main {
 			}
 		} else {
 			for (Operator operator : parseTreeList) {
-				System.out.println(new JSONObject(operator.getDetails()));
+				Map<String, Object> root = new HashMap<String, Object>();
+				root.put("TYPE", "PRINT");
+				root.put("SRC", operator.getDetails());
+				root.put("EXPRESSION", new ArrayList<Object>());
+				System.out.println(new JSONObject(root));
 			}
 		}
 			

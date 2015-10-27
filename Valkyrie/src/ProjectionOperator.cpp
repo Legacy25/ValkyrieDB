@@ -6,10 +6,8 @@ ProjectionOperator::ProjectionOperator(std::vector<std::string> expressions, std
 	this->children = children;
 }
 
-Tuple ProjectionOperator::produce(){
-	return NULL;
+void ProjectionOperator::produce(){
 }
 
-void ProjectionOperator::consume(Tuple tuple){
-
+void ProjectionOperator::consume(){
 }
