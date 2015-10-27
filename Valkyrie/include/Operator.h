@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <string>
+#include <stack>
+#include <algorithm>
 
 #include "Tuple.h"
 
@@ -12,6 +14,7 @@ protected:
 	std::vector<std::string> expressions;
 	std::vector<Operator*> children;
 public:
+	std::string queryPlan();
 	std::string toString();
 	std::vector<Operator*> getChildren();
 	//LLVM code generation
