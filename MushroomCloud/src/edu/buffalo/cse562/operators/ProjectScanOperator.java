@@ -214,6 +214,7 @@ public class ProjectScanOperator implements Operator {
 	public Map<String, Object> getDetails() {
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<Object> expList = new ArrayList<Object>();
+		expList.add(oldSchema.getTableName() + "=" + oldSchema.getTableFile());
 		for(ColumnWithType col : oldSchema.getColumns())
 			expList.add(col.getColumnName() + "=" + col.getColumnType());
 		List<Object> srcs = new ArrayList<Object>();

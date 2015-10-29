@@ -1,5 +1,17 @@
 #include "Operator.h"
 
+using namespace valkyrie;
+
+Operator::Operator(std::vector<Operator*> children){
+	this->children = children;
+	for(int i = 0; i < children.size(); i++)
+		children[i]->setParent(this);
+}
+
+Operator::~Operator(){
+	delete schema;
+}
+
 std::vector<Operator*> Operator::getChildren(){
 	return this->children;
 }
@@ -30,4 +42,26 @@ std::string Operator::queryPlan(){
 			s.push(std::make_pair(v[i], p.second+1));
 	}
 	return res;
+}
+
+DataType Operator::mapType(std::string type){
+	if(type == "int"  || type == "integer")
+		return LONG;
+	if(type == "char" || type == "varchar")
+		return STRING;
+	//check this
+	if(type == "date")
+		return DATE;
+	if(type == "double" || type == "decimal")
+		return DOUBLE;
+	std::cerr << "Error parsing type" << std::endl;
+	std::exit(-1);
+}
+
+Schema* Operator::getSchema(){
+	return schema;
+}
+
+void Operator::setParent(Operator* parent){
+	this->parent = parent;
 }

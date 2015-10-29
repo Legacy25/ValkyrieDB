@@ -196,6 +196,7 @@ public class ScanOperator implements Operator {
 	public Map<String, Object> getDetails() {
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<Object> expList = new ArrayList<Object>();
+		expList.add(schema.getTableName() + "=" + schema.getTableFile());
 		for(ColumnWithType col : schema.getColumns())
 			expList.add(col.getColumnName() + "=" + col.getColumnType());
 		List<Object> srcs = new ArrayList<Object>();

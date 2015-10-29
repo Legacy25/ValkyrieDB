@@ -1,5 +1,7 @@
 #include "Parser.h"
 
+using namespace valkyrie;
+
 Operator* Parser::parseJson(std::string json){
 	rapidjson::Document doc;
 	doc.Parse(json.c_str());

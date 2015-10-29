@@ -29,7 +29,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 valkyrie: $(OBJ_PATH)
-	$(CC) -o bin/$@ $^ $(CFLAGS) $(LIBS)
+	clang++-3.5 Valkyrie/src/*.cpp -g -O0 `llvm-config-3.5 --cxxflags --ldflags --system-libs --libs core mcjit native bitwriter` -o bin/llvmruntime -I./Valkyrie/include
 
 clean:
 	rm -r MushroomCloud/bin

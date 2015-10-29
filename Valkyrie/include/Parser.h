@@ -9,11 +9,13 @@
 #include "ProjectionOperator.h"
 #include "rapidjson/document.h"
 
-class Parser {
-private:
-	Operator* createTree(const rapidjson::Value& node);
-public:
-	Operator* parseJson(std::string json);
-};
+namespace valkyrie{
+	class Parser {
+	private:
+		Operator* createTree(const rapidjson::Value& node);
+	public:
+		Operator* parseJson(std::string json);
+	};
+}
 
 #endif

@@ -5,21 +5,32 @@
 #include <string>
 #include <stack>
 #include <algorithm>
+#include <iostream>
 
-#include "Tuple.h"
+#include "DataTypes.h"
+#include "Schema.h"
 
-class Operator {
-protected:
-	std::string type;
-	std::vector<std::string> expressions;
-	std::vector<Operator*> children;
-public:
-	std::string queryPlan();
-	std::string toString();
-	std::vector<Operator*> getChildren();
+namespace valkyrie{
+	class Operator {
+	protected:
+		std::string type;
+		valkyrie::Schema *schema;
+		std::vector<std::string> expressions;
+		Operator* parent;
+		std::vector<Operator*> children;
+		DataType mapType(std::string type);
+	public:
+		Operator(std::vector<Operator*> children);
+		~Operator();
+		valkyrie::Schema* getSchema();
+		void setParent(Operator* parent);
+		std::string queryPlan();
+		std::string toString();
+		std::vector<Operator*> getChildren();
 	//LLVM code generation
-	virtual void consume() = 0;
-	virtual void produce() = 0;
-};
+		virtual void consume() = 0;
+		virtual void produce() = 0;
+	};
+}
 
 #endif

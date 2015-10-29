@@ -3,11 +3,16 @@
 
 #include "Operator.h"
 
-class ScanOperator : public Operator {
-public:
-	ScanOperator(std::vector<std::string> expressions, std::vector<Operator*> children);
-	void consume();
-	void produce();
-};
+namespace valkyrie{
+	class ScanOperator : public Operator {
+	private:
+		void convertToSchema();
+	public:
+		ScanOperator(std::vector<std::string> expressions, std::vector<Operator*> children);
+		~ScanOperator();
+		void consume();
+		void produce();
+	};
+}
 
 #endif

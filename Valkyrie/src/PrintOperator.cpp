@@ -1,13 +1,22 @@
 #include "PrintOperator.h"
+#include "Codegen.h"
 
-PrintOperator::PrintOperator(std::vector<std::string> expressions, std::vector<Operator*> children){
+using namespace valkyrie;
+
+PrintOperator::PrintOperator(std::vector<std::string> expressions, std::vector<Operator*> children) : Operator(children){
 	this->type = "PRINT";
 	this->expressions = expressions;
-	this->children = children;
+	schema = children[0]->getSchema();
+	types = (int *)&(schema->getTypes()->front());
 }
 
 void PrintOperator::produce(){
+	for(int i = 0; i < children.size(); i++)
+		assert(children[i] != NULL);
+	assert(parent != NULL);
+	children[0]->produce();
 }
 
 void PrintOperator::consume(){
+	codegen::printConsume(types);
 }

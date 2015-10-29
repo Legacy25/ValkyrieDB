@@ -3,11 +3,13 @@
 
 #include "Operator.h"
 
-class SelectOperator : public Operator {
-public:
-	SelectOperator(std::vector<std::string> expressions, std::vector<Operator*> children);
-	void consume();
-	void produce();
-};
+namespace valkyrie{
+	class SelectOperator : public Operator {
+	public:
+		SelectOperator(std::vector<std::string> expressions, std::vector<Operator*> children);
+		void consume();
+		void produce();
+	};
+}
 
 #endif
