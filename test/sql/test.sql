@@ -1,4 +1,4 @@
-CREATE TABLE NATION (nationkey INT , name CHAR (25) , regionkey INT REFERENCES REGION, comment VARCHAR (152) , PRIMARY KEY (nationkey))
+CREATE TABLE NATION (nationkey INT , name CHAR (25) , regionkey INT REFERENCES REGION, comment VARCHAR (152) , PRIMARY KEY (nationkey)); 
 SELECT * FROM NATION;
 
  --CREATE TABLE LINEITEM (orderkey INT REFERENCES ORDERS, partkey INT REFERENCES PARTS, suppkey INT REFERENCES SUPPLIERS, linenumber INT , quantity DECIMAL , extendedprice DECIMAL , discount DECIMAL , tax DECIMAL , returnflag CHAR (1) , linestatus CHAR (1) , shipdate DATE , commitdate DATE , receiptdate DATE , shipinstruct CHAR (25) , shipmode CHAR (10) , comment VARCHAR (44) , PRIMARY KEY (orderkey, linenumber))
