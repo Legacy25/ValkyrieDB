@@ -13,7 +13,6 @@ PrintOperator::PrintOperator(std::vector<std::string> expressions, std::vector<O
 void PrintOperator::produce(){
 	for(int i = 0; i < children.size(); i++)
 		assert(children[i] != NULL);
-	assert(parent != NULL);
 	children[0]->produce();
 }
 

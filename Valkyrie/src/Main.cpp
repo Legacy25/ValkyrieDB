@@ -25,32 +25,6 @@ int main()
 
     /* Initializations */
     codegen::initialize("LLVM");
-    //Translator *root = NULL;
-
-
-    /* Programatically create the AST here
-     * Hardcoded for now, this is the part
-     * to be done by Vinayak
-     *
-     * Once the AST is generated and the
-     * schemas are materialized, set root
-     * to the top of the tree, rest will be
-     * handled automatically
-     */
-    /*Schema nation("nation", "data/nation.tbl");
-    nation.addAttribute("nationkey", LONG);
-    nation.addAttribute("name", STRING);
-    nation.addAttribute("regionkey", LONG);
-    nation.addAttribute("comment", STRING);
-
-    nation.materialize();
-
-    ScanTranslator scanTranslator(&nation);
-    PrintTranslator printTranslator(&nation);
-    printTranslator.setLeft(&scanTranslator);
-    scanTranslator.setParent(&printTranslator);
-
-    root = &printTranslator;*/
 
     /* Generate LLVM */
     assert(root != NULL);
