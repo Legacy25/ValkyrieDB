@@ -52,7 +52,7 @@ public class ParseTreeGenerator {
 			File dir = new File(dDirs);
 			File files[] = dir.listFiles();
 			for(File f : files) {
-				if(f.getName().equalsIgnoreCase(tableName+".dat"))
+				if(f.getName().equalsIgnoreCase(tableName+".tbl"))
 					return f.getAbsolutePath();
 			}
 		}
