@@ -121,7 +121,6 @@ ExecutionEngine* codegen::compile() {
 
 void codegen::scanConsume(const TupPtr tp, valkyrie::Operator *parent) {
     Type *ptrToPtr = PointerType::get(int64PtrType, 0);
-    cout << "YAAYY!!!" << tp.ptr << endl;
     Value *ptr = builder->CreateIntToPtr(ConstantInt::get(int64Type, tp.ptr), ptrToPtr);
     ac = ConstantInt::get(int32Type, tp.att_count);
     tc = ConstantInt::get(int32Type, tp.tup_count);

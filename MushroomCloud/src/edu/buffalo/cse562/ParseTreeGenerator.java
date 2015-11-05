@@ -67,6 +67,8 @@ public class ParseTreeGenerator {
 				return tables.get(i);
 		}
 		
+		System.out.println("Couldn't find schema for table "+fileName);
+		System.exit(-1);
 		return null;
 	}
 	

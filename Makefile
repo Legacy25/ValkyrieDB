@@ -7,8 +7,8 @@ OBJ_FILES = $(SRC_FILES:.cpp=.o)
 OBJ_PATH  = $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(OBJ_FILES))
 
 LIBS= 
-CC=clang++-3.5
-CFLAGS=-g -O0 `llvm-config-3.5 --cxxflags --ldflags --system-libs --libs core mcjit native bitwriter`
+CC=clang++
+CFLAGS=-g -O0 `llvm-config --cxxflags --ldflags --system-libs --libs core mcjit native bitwriter`
 
 all: init mushroomcloud valkyrie
 

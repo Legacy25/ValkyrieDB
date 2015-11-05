@@ -219,11 +219,13 @@ public class Main {
 			}
 		} else {
 			for (Operator operator : parseTreeList) {
-				Map<String, Object> root = new HashMap<String, Object>();
-				root.put("TYPE", "PRINT");
-				root.put("SRC", operator.getDetails());
-				root.put("EXPRESSION", new ArrayList<Object>());
-				System.out.println(new JSONObject(root));
+				if(operator != null) {
+					Map<String, Object> root = new HashMap<String, Object>();
+					root.put("TYPE", "PRINT");
+					root.put("SRC", operator.getDetails());
+					root.put("EXPRESSION", new ArrayList<Object>());
+					System.out.println(new JSONObject(root));
+				}
 			}
 		}
 			
