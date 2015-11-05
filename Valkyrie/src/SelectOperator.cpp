@@ -9,7 +9,11 @@ SelectOperator::SelectOperator(std::vector<std::string> expressions, std::vector
 }
 
 void SelectOperator::produce(){
+	for(int i = 0; i < children.size(); i++)
+		assert(children[i] != NULL);
+	children[0]->produce();
 }
 
 void SelectOperator::consume(){
+	codegen::selectConsume(expressions, parent);
 }

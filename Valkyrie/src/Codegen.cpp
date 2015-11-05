@@ -158,7 +158,23 @@ void codegen::scanConsume(const TupPtr tp, valkyrie::Operator *parent) {
 
     builder->SetInsertPoint(afterLoop);
 }
+void codegen::selectConsume(std::vector<std::string> expressions, valkyrie::Operator parent){
+    //Creating an instance of expression class by giving it expressions
+   /* Expression exp = new Expression(expressions)
+    Value* condV = exp.getValue(tuplePtr);
+    BasicBlock *cond_true = BasicBlock::Create(context, "If"+to_string(nameCtr++), mainFunction);
+    //If the tuple does not satisfy the where condition and also after returning from parent produce
+    BasicBlock *merge = BasicBlock::Create(context, "continue"+to_string(nameCtr));
+    builder->CreateCondBr(condV, cond_true, merge);
+    builder->SetInsertPoint(cond_true);
+    if(condV){
+        parent.produce();
+    }
+    builder->CreateBr(merge);
+    builder->SetInsertPoint(merge);
+*/
 
+}
 void codegen::printConsume(int *types) {
     Value *loopVar =
             builder->CreateAlloca(
