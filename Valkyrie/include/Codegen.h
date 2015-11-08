@@ -18,6 +18,7 @@ namespace codegen {
     ExecutionEngine* compile();
 
     void scanConsume(const TupPtr, valkyrie::Operator* parent);
+    void selectConsume(std::vector<std::string> expressions, valkyrie::Operator *parent);
     void printConsume(int*);
 }
 

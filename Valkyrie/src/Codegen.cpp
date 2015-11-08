@@ -157,8 +157,8 @@ void codegen::scanConsume(const TupPtr tp, valkyrie::Operator *parent) {
 
     builder->SetInsertPoint(afterLoop);
 }
-void codegen::selectConsume(std::vector<std::string> expressions, valkyrie::Operator parent){
-    //Creating an instance of expression class by giving it expressions
+
+void codegen::selectConsume(std::vector<std::string> expressions, valkyrie::Operator *parent){
    /* Expression exp = new Expression(expressions)
     Value* condV = exp.getValue(tuplePtr);
     BasicBlock *cond_true = BasicBlock::Create(context, "If"+to_string(nameCtr++), mainFunction);
@@ -174,6 +174,7 @@ void codegen::selectConsume(std::vector<std::string> expressions, valkyrie::Oper
 */
 
 }
+
 void codegen::printConsume(int *types) {
     Value *loopVar =
             builder->CreateAlloca(
