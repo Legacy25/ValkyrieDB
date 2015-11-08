@@ -18,6 +18,8 @@ public:
     virtual Value* evaluate() = 0;
 };
 
+
+
 //Arithmetic Operators
 class Addition: public BinaryExpression {
     Operations operation = Operations.ADDITION;
@@ -25,7 +27,6 @@ public:
     Value* getValue();
     Value* evaluate();
 };
-
 
 class Subtraction: public BinaryExpression {
     Operations operation = Operations.SUBTRACTION;
@@ -48,11 +49,14 @@ public:
     Value* evaluate();
 };
 
+
+
 //Logical Operators
 class And: public BinaryExpression {
     Operations operation = Operations.AND;
 public:
     Value* getValue();
+    Value* evaluate();
 };
 
 class Or: public BinaryExpression {
