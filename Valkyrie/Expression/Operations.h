@@ -1,0 +1,21 @@
+#ifndef VALKYRIEDB_OPERATIONS_H
+#define VALKYRIEDB_OPERATIONS_H
+
+
+typedef enum {
+    ADDITION = 1,
+    SUBTRACTION = 2,
+    MULTIPLICATION = 3,
+    DIVISION = 4,
+    AND = 5,
+    OR = 6,
+    NOT = 7,
+    EQUAL = 8,
+    NOT_EQUAL = 9,
+    LESS_THAN = 10,
+    LESS_THAN_EQUAL = 11,
+    GREATER_THAN = 12,
+    GREATER_THAN_EQUAL = 13
+} Operations;
+
+#endif //VALKYRIEDB_OPERATIONS_H
