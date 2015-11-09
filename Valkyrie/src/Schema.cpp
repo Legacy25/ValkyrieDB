@@ -1,11 +1,10 @@
 #include <iostream>
-#include <iosfwd>
 #include <fstream>
 #include <sstream>
 #include <cstring>
 
-#include "Schema.h"
-#include "Operator.h"
+#include "../include/Schema.h"
+#include "../include/Operator.h"
 
 using namespace std;
 using namespace valkyrie;
@@ -101,47 +100,14 @@ bool Schema::isMaterialized() const {
     return materialized;
 }
 
-void Schema::dump() const {
-    if(!materialized) {
-        cout << "Cannot dump, not materialized!";
-        return;
-    }
-
-    int n = attributes.size();
-    for(auto it = tuples.begin(); it != tuples.end(); it++) {
-        LeafValue *tuple = it.operator*();
-        for(int i=0; i<n; i++) {
-            switch(types[i]) {
-                case LONG:
-                cout << (long) tuple[i] << "|";
-                break;
-                case DOUBLE:
-                cout << (double) tuple[i] << "|";
-                break;
-                case STRING:
-                case DATE:
-                cout << (char *) tuple[i] << "|";
-                break;
-            }
-        }
-        cout << endl;
-    }
-}
-
 ostream& operator<<(ostream &stream, const  Schema &schema) {
     string attrs = schema.attrsVecsToCommaSepString(schema.getAttributes(), *(schema.getTypes()));
     return stream << schema.getTableName() << " : " << schema.getDataFile() << endl
     << attrs;
 }
 
-TupPtr Schema::getTupPtr() const {
-    TupPtr tp;
-
-    tp.ptr = (int64_t) &tuples[0];
-    tp.att_count = types.size();
-    tp.tup_count = tuples.size();
-
-    return tp;
+uint64_t Schema::getTuplePtr() const {
+    return (uint64_t) &tuples[0];
 }
 
 const vector<DataType>* Schema::getTypes() const{
@@ -158,4 +124,8 @@ vector<string> Schema::getAttributes() const{
 
 string Schema::getTableName() const{
     return tablename;
+}
+
+size_t Schema::getTupleCount() const {
+    return tuples.size();
 }

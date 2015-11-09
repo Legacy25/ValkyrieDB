@@ -1,9 +1,8 @@
 #include <iostream>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 
-#include "Schema.h"
-#include "Codegen.h"
-#include "Parser.h"
+#include "../include/Parser.h"
+#include "../include/Codegen.h"
 
 using namespace std;
 

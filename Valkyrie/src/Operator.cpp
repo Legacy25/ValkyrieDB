@@ -1,4 +1,4 @@
-#include "Operator.h"
+#include "../include/Operator.h"
 
 using namespace valkyrie;
 

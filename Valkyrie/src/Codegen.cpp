@@ -3,16 +3,17 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/Bitcode/ReaderWriter.h"
-#include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/ExecutionEngine/MCJIT.h"
 #include "llvm/ExecutionEngine/GenericValue.h"
 #include "llvm/Support/TargetSelect.h"
 
-#include "Codegen.h"
+#include "../include/Codegen.h"
+#include "../include/Schema.h"
 
 using namespace llvm;
 using namespace std;
+using namespace valkyrie;
 
 /* Codegen Essentials */
 static LLVMContext &context = getGlobalContext();
@@ -119,11 +120,11 @@ ExecutionEngine* codegen::compile() {
 
 
 
-void codegen::scanConsume(const TupPtr tp, valkyrie::Operator *parent) {
+void codegen::scanConsume(const Schema& schema, valkyrie::Operator *parent) {
     Type *ptrToPtr = PointerType::get(int64PtrType, 0);
-    Value *ptr = builder->CreateIntToPtr(ConstantInt::get(int64Type, tp.ptr), ptrToPtr);
-    ac = ConstantInt::get(int32Type, tp.att_count);
-    tc = ConstantInt::get(int32Type, tp.tup_count);
+    Value *ptr = builder->CreateIntToPtr(ConstantInt::get(int64Type, schema.getTuplePtr()), ptrToPtr);
+    ac = ConstantInt::get(int32Type, schema.getAttributes().size());
+    tc = ConstantInt::get(int32Type, schema.getTupleCount());
 
     Value *loopVar =
             builder->CreateAlloca(
@@ -245,4 +246,8 @@ void codegen::printConsume(int *types) {
 
     builder->SetInsertPoint(afterLoop);
     builder->CreateCall(printfFunc, vector<Value*>({newLine}));
+}
+
+IRBuilder<>* codegen::getBuilder() {
+    return builder;
 }

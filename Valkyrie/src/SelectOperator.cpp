@@ -1,5 +1,5 @@
-#include "SelectOperator.h"
-#include "Codegen.h"
+#include "../include/SelectOperator.h"
+#include "../include/Codegen.h"
 
 using namespace valkyrie;
 
@@ -9,11 +9,11 @@ SelectOperator::SelectOperator(std::vector<std::string> expressions, std::vector
 }
 
 void SelectOperator::produce(){
-	for(int i = 0; i < children.size(); i++)
-		assert(children[i] != NULL);
+	assert(children[0] != NULL);
 	children[0]->produce();
 }
 
 void SelectOperator::consume(){
+	assert(parent != NULL);
 	codegen::selectConsume(expressions, parent);
 }

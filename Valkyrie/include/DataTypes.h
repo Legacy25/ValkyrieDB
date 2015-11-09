@@ -6,10 +6,10 @@
 using namespace std;
 
 typedef enum {
-    LONG = 1,
-    DOUBLE = 2,
-    STRING = 3,
-    DATE = 4
+    LONG,
+    DOUBLE,
+    STRING,
+    DATE
 } DataType;
 
 typedef int64_t LeafValue;

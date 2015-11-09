@@ -2,6 +2,7 @@
 #define SELECT_OPERATOR_H
 
 #include "Operator.h"
+#include "Expression.h"
 
 namespace valkyrie{
 	class SelectOperator : public Operator {

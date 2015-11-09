@@ -9,15 +9,19 @@
 
 #include "DataTypes.h"
 #include "Operator.h"
+#include "Schema.h"
 
 using namespace llvm;
 using namespace std;
+using namespace valkyrie;
 
 namespace codegen {
-    void initialize(string);
+    void initialize(std::string);
     ExecutionEngine* compile();
 
-    void scanConsume(const TupPtr, valkyrie::Operator* parent);
+    IRBuilder<>* getBuilder();
+
+    void scanConsume(const Schema&, valkyrie::Operator* parent);
     void selectConsume(std::vector<std::string> expressions, valkyrie::Operator *parent);
     void printConsume(int*);
 }

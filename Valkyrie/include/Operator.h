@@ -11,6 +11,7 @@
 #include "Schema.h"
 
 namespace valkyrie{
+
 	class Operator {
 	protected:
 		std::string type;
@@ -19,6 +20,7 @@ namespace valkyrie{
 		Operator* parent;
 		std::vector<Operator*> children;
 		DataType mapType(std::string type);
+
 	public:
 		Operator(std::vector<Operator*> children);
 		~Operator();
@@ -27,6 +29,7 @@ namespace valkyrie{
 		std::string queryPlan();
 		std::string toString();
 		std::vector<Operator*> getChildren();
+
 	//LLVM code generation
 		virtual void consume() = 0;
 		virtual void produce() = 0;

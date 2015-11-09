@@ -1,5 +1,5 @@
-#include "ScanOperator.h"
-#include "Codegen.h"
+#include "../include/ScanOperator.h"
+#include "../include/Codegen.h"
 
 using namespace valkyrie;
 
@@ -33,5 +33,5 @@ void ScanOperator::produce(){
 void ScanOperator::consume(){
 	schema->materialize();
 	//schema->dump();
-	codegen::scanConsume(schema->getTupPtr(), parent);
+	codegen::scanConsume(*schema, parent);
 }

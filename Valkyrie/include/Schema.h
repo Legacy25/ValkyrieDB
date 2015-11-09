@@ -20,15 +20,21 @@ namespace valkyrie{
 
     public:
         Schema(string tablename, string datafile);
+
         void addAttribute(string, DataType);
         void materialize();
-        void dump() const;
         bool isMaterialized() const;
-        TupPtr getTupPtr() const;
+
+        // Getters
+        uint64_t getTuplePtr() const;
+        size_t getTupleCount() const;
         const vector<DataType>* getTypes() const;
         std::string getDataFile() const;
         vector<string> getAttributes() const;
         string getTableName() const;
+
+
+        // Utilities
         friend ostream& operator<<(ostream &stream, const Schema &schema);
         std::string attrsVecsToCommaSepString(const vector<string>& attr, const vector<DataType>& types) const;
     };

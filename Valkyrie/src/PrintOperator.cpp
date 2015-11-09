@@ -1,5 +1,5 @@
-#include "PrintOperator.h"
-#include "Codegen.h"
+#include "../include/PrintOperator.h"
+#include "../include/Codegen.h"
 
 using namespace valkyrie;
 
