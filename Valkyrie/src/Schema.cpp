@@ -5,6 +5,8 @@
 
 #include "../include/Schema.h"
 #include "../include/Operator.h"
+#include "../../../../../../usr/include/c++/4.8.3/x86_64-redhat-linux/bits/c++config.h"
+#include "../../../../../../usr/lib/gcc/x86_64-redhat-linux/4.8.3/include/stddef.h"
 
 using namespace std;
 using namespace valkyrie;
@@ -121,9 +123,26 @@ std::string Schema::getDataFile() const{
 vector<string> Schema::getAttributes() const{
     return attributes;
 }
-
+size_t Schema::getAttributePos(string colName) const {
+    for(size_t i =0; i < attributes.size(); i++){
+        if(attributes.at(i) == colName){
+            return  i;
+        }
+    }
+    std::cerr << "colName NOT Found"<<std::endl();
+    exit(-1);
+}
 string Schema::getTableName() const{
     return tablename;
+}
+DataType Schema::getAttributeType(string colName) const {
+    for(size_t i =0; i < attributes.size(); i++){
+        if(attributes.at(i) == colName){
+            return  types.at(i);
+        }
+    }
+    std::cerr << "colName NOT Found"<<std::endl();
+    exit(-1);
 }
 
 size_t Schema::getTupleCount() const {

@@ -3,6 +3,8 @@
 #include "llvm/IR/IRBuilder.h"
 #include "../include/Expression.h"
 #include "../include/Codegen.h"
+#include "../../../../../../usr/include/c++/4.8.3/x86_64-redhat-linux/bits/c++config.h"
+#include "../../../../../../usr/lib/gcc/x86_64-redhat-linux/4.8.3/include/stddef.h"
 
 using namespace valkyrie;
 using namespace llvm;
@@ -259,6 +261,29 @@ Value* DateValueExpression::getValue() {
 
 Value* ColExpression::getValue() {
     IRBuilder<>* builder = codegen::getBuilder();
-    // TODO
+    std::size_t pos = codegen::getAttPos(colname);
+    DataType dt = codegen::getAttType(colname);
+    Value* tupleptr = codegen::getTupleptr();
+
+    Value *indices[1];
+    indices[0] = std::size_t;
+    ArrayRef<Value *> indicesRef(indices);
+
+    Value *data = builder->CreateLoad(
+            builder->CreateInBoundsGEP(tuplePtr, indicesRef)
+    );
+
+    switch(dt){
+        case LONG:
+            Type* int64Ty = Type::getInt64Ty(getGlobalContext());
+            return ConstantInt::get(int64Ty, data, true);
+        case DOUBLE:
+            Type* doubleTy = Type::getDoubleTy(getGlobalContext());
+            return ConstantFP::get(doubleTy, data);
+        case STRING:
+        case DATE:
+            break;
+
+    }
     return NULL;
 }

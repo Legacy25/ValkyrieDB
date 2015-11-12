@@ -290,12 +290,12 @@ namespace valkyrie{
     class ColExpression: public Expression {
     private:
         ExprType exprType = COLEXPRESSION;
-        string* colname;
+        string colname;
 
     public:
-        string* getColName();
-        void setColName(string*);
-        Value* getValue();
+        string getColName();
+        void setColName(string);
+        Value getValue();
     };
 }
 

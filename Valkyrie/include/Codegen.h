@@ -20,6 +20,7 @@ namespace codegen {
     ExecutionEngine* compile();
 
     IRBuilder<>* getBuilder();
+    Value* getTupleptr();
 
     void scanConsume(const Schema&, valkyrie::Operator* parent);
     void selectConsume(std::vector<std::string> expressions, valkyrie::Operator *parent);

@@ -10,6 +10,7 @@
 
 #include "../include/Codegen.h"
 #include "../include/Schema.h"
+#include "../../../../../../usr/include/c++/4.8.3/bits/stringfwd.h"
 
 using namespace llvm;
 using namespace std;
@@ -40,7 +41,7 @@ static Value *dtLong = ConstantInt::get(int32Type, LONG);
 static Value *dtDouble = ConstantInt::get(int32Type, DOUBLE);
 static Value *dtString = ConstantInt::get(int32Type, STRING);
 static Value *dtDate = ConstantInt::get(int32Type, DATE);
-
+static Schema gschema;
 
 /* Counters and useful globals for codegen */
 static uint32_t nameCtr = 0;
@@ -121,6 +122,7 @@ ExecutionEngine* codegen::compile() {
 
 
 void codegen::scanConsume(const Schema& schema, valkyrie::Operator *parent) {
+    gschema = schema;
     Type *ptrToPtr = PointerType::get(int64PtrType, 0);
     Value *ptr = builder->CreateIntToPtr(ConstantInt::get(int64Type, schema.getTuplePtr()), ptrToPtr);
     ac = ConstantInt::get(int32Type, schema.getAttributes().size());
@@ -250,4 +252,12 @@ void codegen::printConsume(int *types) {
 
 IRBuilder<>* codegen::getBuilder() {
     return builder;
+}
+
+size_t codegen::getAttPos(string colname){
+    return gschema.getAttributePos(colname);
+}
+Value* codegen::getTupleptr()
+{
+    return tuplePtr;
 }

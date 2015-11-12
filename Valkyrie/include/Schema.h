@@ -5,6 +5,7 @@
 #include <string>
 
 #include "DataTypes.h"
+#include "../../../../../../usr/include/c++/4.8.3/x86_64-redhat-linux/bits/c++config.h"
 
 using namespace std;
 
@@ -32,6 +33,8 @@ namespace valkyrie{
         std::string getDataFile() const;
         vector<string> getAttributes() const;
         string getTableName() const;
+        size_t getAttributePos(string) const;
+        DataType getAttributeType(string) const;
 
 
         // Utilities
