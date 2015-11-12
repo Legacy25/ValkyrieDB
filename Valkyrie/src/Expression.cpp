@@ -151,6 +151,22 @@ Value* EqualExpression::getValue() {
 
             //------------------------------------------------------------------------
 
+
+            /* BackUp - Code to use an if condition within the loop
+
+            // if both characters not equal return false
+            // false block which returns FALSE
+            BasicBlock *startFalseBlock = BasicBlock::Create(context, "If"+to_string(nameCtr++), loopFunction);
+            builder->CreateBr(startFalseBlock);
+            builder->SetInsertPoint(startFalseBlock);
+
+            //Compare characters
+
+            BasicBlock *endFalseBlock = BasicBlock::Create(context, "endLoopBody"+to_string(nameCounter++), loopFunction);
+            builder->CreateCondBr(cmp, startFalseBlock, endFalseBlock);
+            builder->SetInsertPoint(endLoopBody);
+            */
+
         case DATEVALUEEXPRESSION:
             // TODO
             break;
