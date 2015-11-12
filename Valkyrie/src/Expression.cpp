@@ -3,19 +3,11 @@
 #include "llvm/IR/IRBuilder.h"
 #include "../include/Expression.h"
 #include "../include/Codegen.h"
-#include "../../../../../../usr/include/c++/4.8.3/x86_64-redhat-linux/bits/c++config.h"
-#include "../../../../../../usr/lib/gcc/x86_64-redhat-linux/4.8.3/include/stddef.h"
+//#include "../../../../../../usr/include/c++/4.8.3/x86_64-redhat-linux/bits/c++config.h"
+//#include "../../../../../../usr/lib/gcc/x86_64-redhat-linux/4.8.3/include/stddef.h"
 
 using namespace valkyrie;
 using namespace llvm;
-
-
-
-ExprType Expression::getType() {
-    return exprType;
-}
-
-
 
 Expression *BinaryExpression::getLeftExpression() {
     return leftExpression;
@@ -100,9 +92,8 @@ Value* EqualExpression::getValue() {
     assert(leftExpression != NULL);
     assert(rightExpression != NULL);
     assert(leftExpression->getType() == rightExpression->getType());
-
     IRBuilder<>* builder = codegen::getBuilder();
-    switch(leftExpression->getType()) {
+    switch(rightExpression->getType()) {
         case LONGVALUEEXPRESSION:
             return builder->CreateICmpEQ(leftExpression->getValue(), rightExpression->getValue());
         case DOUBLEVALUEEXPRESSION:
@@ -113,7 +104,7 @@ Value* EqualExpression::getValue() {
             // (or)
             // iterate through the characters in the String for comparision
             //------------------------------------------------------------------------
-            static uint32_t nameCounter = 0;
+            /*static uint32_t nameCounter = 0;
 
             FunctionType *loopFunctionType = FunctionType::get(int32Type, false);
             Function *loopFunction = Function::Create(loopFunctionType, Function::ExternalLinkage, "StringCheckStart", module);
@@ -133,23 +124,23 @@ Value* EqualExpression::getValue() {
 
             Value *indices[1];
             indices[0] = i;
-            ArrayRef<Value *> indicesRef(indices);
+            ArrayRef<Value *> indicesRef(indices);*/
 
             //TODO
-            Value *charString1 = builder->CreateLoad(   /* Load each character of the String 1 */   );
-            Value *charString2 = builder->CreateLoad(   /* Load each character of the String 2 */   );
+            //Value *charString1 = builder->CreateLoad(   /* Load each character of the String 1 */   );
+            //Value *charString2 = builder->CreateLoad(   /* Load each character of the String 2 */   );
 
-            Value *increment = builder->CreateAdd(i, ConstantInt::get(int32Type, 1));
-            builder->CreateStore(increment, loopIndex);
+            //Value *increment = builder->CreateAdd(i, ConstantInt::get(int32Type, 1));
+            //builder->CreateStore(increment, loopIndex);
 
             // Comapare both characters and use this as an exit condition of the loop
             // Or Run the loop until the length of small String
             //TODO
-            Value *cmp = builder->CreateICmpSLT(increment, /* min of lenString1 and lenString2 */);
+            //Value *cmp = builder->CreateICmpSLT(increment, /* min of lenString1 and lenString2 */);
 
-            BasicBlock *endLoopBody = BasicBlock::Create(context, "endLoopBody"+to_string(nameCounter++), loopFunction);
+            /*BasicBlock *endLoopBody = BasicBlock::Create(context, "endLoopBody"+to_string(nameCounter++), loopFunction);
             builder->CreateCondBr(cmp, startLoopBody, endLoopBody);
-            builder->SetInsertPoint(endLoopBody);
+            builder->SetInsertPoint(endLoopBody);*/
 
             //------------------------------------------------------------------------
 
@@ -298,16 +289,26 @@ Value* LessThanEqualExpression::getValue() {
 
 
 
-
+LongValueExpression::LongValueExpression(long data){
+    this->data = data;
+}
 
 Value* LongValueExpression::getValue() {
     Type* int64Ty = Type::getInt64Ty(getGlobalContext());
     return ConstantInt::get(int64Ty, data, true);
 }
 
+DoubleValueExpression::DoubleValueExpression(double data){
+    this->data = data;
+}
+
 Value* DoubleValueExpression::getValue() {
     Type* doubleTy = Type::getDoubleTy(getGlobalContext());
     return ConstantFP::get(doubleTy, data);
+}
+
+StringValueExpression::StringValueExpression(std::string* data){
+    this->data = data;
 }
 
 Value* StringValueExpression::getValue() {
@@ -320,6 +321,10 @@ Value* DateValueExpression::getValue() {
     return NULL;
 }
 
+ColExpression::ColExpression(std::string name){
+    colname = name;
+}
+
 Value* ColExpression::getValue() {
     IRBuilder<>* builder = codegen::getBuilder();
     std::size_t pos = codegen::getAttPos(colname);
@@ -327,20 +332,18 @@ Value* ColExpression::getValue() {
     Value* tupleptr = codegen::getTupleptr();
 
     Value *indices[1];
-    indices[0] = std::size_t;
+    indices[0] = ConstantInt::get(Type::getInt32Ty(getGlobalContext()), pos);
     ArrayRef<Value *> indicesRef(indices);
 
     Value *data = builder->CreateLoad(
-            builder->CreateInBoundsGEP(tuplePtr, indicesRef)
+            builder->CreateInBoundsGEP(tupleptr, indicesRef)
     );
 
     switch(dt){
         case LONG:
-            Type* int64Ty = Type::getInt64Ty(getGlobalContext());
-            return ConstantInt::get(int64Ty, data, true);
+            return data;
         case DOUBLE:
-            Type* doubleTy = Type::getDoubleTy(getGlobalContext());
-            return ConstantFP::get(doubleTy, data);
+            return builder->CreateUIToFP(data, Type::getDoubleTy(getGlobalContext()));
         case STRING:
         case DATE:
             break;

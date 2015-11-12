@@ -3,9 +3,11 @@
 
 #include "Operator.h"
 #include "Expression.h"
+#include "ExpressionParser.h"
 
 namespace valkyrie{
 	class SelectOperator : public Operator {
+		Expression* selectClause;
 	public:
 		SelectOperator(std::vector<std::string> expressions, std::vector<Operator*> children);
 		void consume();

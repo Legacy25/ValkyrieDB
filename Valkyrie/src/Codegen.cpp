@@ -10,7 +10,8 @@
 
 #include "../include/Codegen.h"
 #include "../include/Schema.h"
-#include "../../../../../../usr/include/c++/4.8.3/bits/stringfwd.h"
+#include "../include/Expression.h"
+//#include "../../../../../../usr/include/c++/4.8.3/bits/stringfwd.h"
 
 using namespace llvm;
 using namespace std;
@@ -41,7 +42,7 @@ static Value *dtLong = ConstantInt::get(int32Type, LONG);
 static Value *dtDouble = ConstantInt::get(int32Type, DOUBLE);
 static Value *dtString = ConstantInt::get(int32Type, STRING);
 static Value *dtDate = ConstantInt::get(int32Type, DATE);
-static Schema gschema;
+static Schema *gschema;
 
 /* Counters and useful globals for codegen */
 static uint32_t nameCtr = 0;
@@ -121,8 +122,8 @@ ExecutionEngine* codegen::compile() {
 
 
 
-void codegen::scanConsume(const Schema& schema, valkyrie::Operator *parent) {
-    gschema = schema;
+void codegen::scanConsume(Schema& schema, valkyrie::Operator *parent) {
+    gschema = &schema;
     Type *ptrToPtr = PointerType::get(int64PtrType, 0);
     Value *ptr = builder->CreateIntToPtr(ConstantInt::get(int64Type, schema.getTuplePtr()), ptrToPtr);
     ac = ConstantInt::get(int32Type, schema.getAttributes().size());
@@ -161,21 +162,18 @@ void codegen::scanConsume(const Schema& schema, valkyrie::Operator *parent) {
     builder->SetInsertPoint(afterLoop);
 }
 
-void codegen::selectConsume(std::vector<std::string> expressions, valkyrie::Operator *parent){
-   /* Expression exp = new Expression(expressions)
-    Value* condV = exp.getValue(tuplePtr);
+void codegen::selectConsume(Expression *clause, valkyrie::Operator *parent){
+    Value* condV = clause->getValue();
     BasicBlock *cond_true = BasicBlock::Create(context, "If"+to_string(nameCtr++), mainFunction);
     //If the tuple does not satisfy the where condition and also after returning from parent produce
     BasicBlock *merge = BasicBlock::Create(context, "continue"+to_string(nameCtr));
     builder->CreateCondBr(condV, cond_true, merge);
     builder->SetInsertPoint(cond_true);
     if(condV){
-        parent.produce();
+        parent->produce();
     }
     builder->CreateBr(merge);
     builder->SetInsertPoint(merge);
-*/
-
 }
 
 void codegen::printConsume(int *types) {
@@ -255,8 +253,13 @@ IRBuilder<>* codegen::getBuilder() {
 }
 
 size_t codegen::getAttPos(string colname){
-    return gschema.getAttributePos(colname);
+    return gschema->getAttributePos(colname);
 }
+
+DataType codegen::getAttType(string colname){
+    return gschema->getAttributeType(colname);
+}
+
 Value* codegen::getTupleptr()
 {
     return tuplePtr;

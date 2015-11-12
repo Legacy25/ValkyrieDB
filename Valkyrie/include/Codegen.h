@@ -10,6 +10,7 @@
 #include "DataTypes.h"
 #include "Operator.h"
 #include "Schema.h"
+#include "Expression.h"
 
 using namespace llvm;
 using namespace std;
@@ -21,9 +22,10 @@ namespace codegen {
 
     IRBuilder<>* getBuilder();
     Value* getTupleptr();
-
-    void scanConsume(const Schema&, valkyrie::Operator* parent);
-    void selectConsume(std::vector<std::string> expressions, valkyrie::Operator *parent);
+    size_t getAttPos(string colname);
+    DataType getAttType(string colname);
+    void scanConsume(Schema&, valkyrie::Operator* parent);
+    void selectConsume(Expression* expressions, valkyrie::Operator *parent);
     void printConsume(int*);
 }
 

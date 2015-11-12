@@ -5,8 +5,8 @@
 
 #include "../include/Schema.h"
 #include "../include/Operator.h"
-#include "../../../../../../usr/include/c++/4.8.3/x86_64-redhat-linux/bits/c++config.h"
-#include "../../../../../../usr/lib/gcc/x86_64-redhat-linux/4.8.3/include/stddef.h"
+//#include "../../../../../../usr/include/c++/4.8.3/x86_64-redhat-linux/bits/c++config.h"
+//#include "../../../../../../usr/lib/gcc/x86_64-redhat-linux/4.8.3/include/stddef.h"
 
 using namespace std;
 using namespace valkyrie;
@@ -129,7 +129,7 @@ size_t Schema::getAttributePos(string colName) const {
             return  i;
         }
     }
-    std::cerr << "colName NOT Found"<<std::endl();
+    std::cerr << "colName NOT Found"<<std::endl;
     exit(-1);
 }
 string Schema::getTableName() const{
@@ -141,7 +141,7 @@ DataType Schema::getAttributeType(string colName) const {
             return  types.at(i);
         }
     }
-    std::cerr << "colName NOT Found"<<std::endl();
+    std::cerr << "colName NOT Found"<<std::endl;
     exit(-1);
 }
 

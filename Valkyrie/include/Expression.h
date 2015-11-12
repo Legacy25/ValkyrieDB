@@ -9,7 +9,7 @@ using namespace std;
 
 namespace valkyrie{
 
-    typedef enum {
+    enum ExprType {
         EXPRESSION,
         BINARYEXPRESSION,
         PRIMITIVEVALUE,
@@ -33,16 +33,14 @@ namespace valkyrie{
         DOUBLEVALUEEXPRESSION,
         STRINGVALUEEXPRESSION,
         DATEVALUEEXPRESSION
-    } ExprType;
+    };
 
     // Base class for all expressions
     class Expression {
     private:
-        ExprType exprType = EXPRESSION;
-
     public:
         virtual Value* getValue() = 0;
-        ExprType getType();
+        virtual ExprType getType(){ return ExprType::EXPRESSION; }
     };
 
 
@@ -50,8 +48,6 @@ namespace valkyrie{
     // Binary Expression is any expression with two child expressions
     class BinaryExpression: public Expression {
     private:
-        ExprType exprType = BINARYEXPRESSION;
-
     protected:
         Expression* leftExpression = NULL;
         Expression* rightExpression = NULL;
@@ -64,6 +60,7 @@ namespace valkyrie{
         void setRightExpression(Expression*);
 
         virtual Value* getValue() = 0;
+        virtual ExprType getType(){ return ExprType::BINARYEXPRESSION; }
     };
 
 
@@ -71,10 +68,9 @@ namespace valkyrie{
     // Primitive is the base of all primitive values
     class PrimitiveValue: public Expression {
     private:
-        ExprType exprType = PRIMITIVEVALUE;
-
     public:
         virtual Value* getValue() = 0;
+        virtual ExprType getType(){ return ExprType::PRIMITIVEVALUE; }
     };
 
 
@@ -85,10 +81,9 @@ namespace valkyrie{
     // Base class of all arithmetic expressions
     class ArithExpression: public BinaryExpression {
     private:
-        ExprType exprType = ARITHEXPRESSION;
-
     public:
         virtual Value* getValue() = 0;
+        virtual ExprType getType(){ return ExprType::ARITHEXPRESSION; }
     };
 
 
@@ -96,8 +91,6 @@ namespace valkyrie{
     // Base class of all logical expressions
     class LogExpression: public BinaryExpression {
     private:
-        ExprType exprType = LOGEXPRESSION;
-
     public:
         virtual Value* getValue() = 0;
     };
@@ -107,10 +100,9 @@ namespace valkyrie{
     // Base class of all comparison expressions
     class CmpExpression: public BinaryExpression{
     private:
-        ExprType exprType = CMPEXPRESSION;
-
     public:
         virtual Value* getValue() = 0;
+        virtual ExprType getType(){ return ExprType::CMPEXPRESSION; }
     };
 
 
@@ -122,32 +114,24 @@ namespace valkyrie{
     // Arithmetic Operators
     class AdditionExpression: public ArithExpression {
     private:
-        ExprType exprType = ADDITIONEXPRESSION;
-
     public:
         Value* getValue();
     };
 
     class SubtractionExpression: public ArithExpression {
     private:
-        ExprType exprType = SUBTRACTIONEXPRESSION;
-
     public:
         Value* getValue();
     };
 
     class MultiplicationExpression: public ArithExpression {
     private:
-        ExprType exprType = MULTIPLICATIONEXPRESSION;
-
     public:
         Value* getValue();
     };
 
     class DivisionExpression: public ArithExpression {
     private:
-        ExprType exprType = DIVISIONEXPRESSION;
-
     public:
         Value* getValue();
     };
@@ -160,16 +144,12 @@ namespace valkyrie{
     // Logical Operators
     class AndExpression: public LogExpression {
     private:
-        ExprType exprType = ANDEXPRESSION;
-
     public:
         Value* getValue();
     };
 
     class OrExpression: public LogExpression {
     private:
-        ExprType exprType = OREXPRESSION;
-
     public:
         Value* getValue();
     };
@@ -183,48 +163,37 @@ namespace valkyrie{
     // Comparision Operators
     class EqualExpression: public CmpExpression {
     private:
-        ExprType exprType = EQUALEXPRESSION;
-
     public:
         Value* getValue();
+        ExprType getType(){ return ExprType::EQUALEXPRESSION; }
     };
 
     class NotEqualExpression: public CmpExpression {
     private:
-        ExprType exprType = NOTEQUALEXPRESSION;
-
     public:
         Value* getValue();
     };
 
     class LessThanExpression: public CmpExpression {
     private:
-        ExprType exprType = LESSTHANEXPRESSION;
-
     public:
         Value* getValue();
     };
 
     class LessThanEqualExpression: public CmpExpression {
     private:
-        ExprType exprType = LESSTHANEQUALEXPRESSION;
-
     public:
         Value* getValue();
     };
 
     class GreaterThanExpression: public CmpExpression {
     private:
-        ExprType exprType = GREATERTHANEXPRESSION;
-
     public:
         Value* getValue();
     };
 
     class GreaterThanEqualExpression: public CmpExpression {
     private:
-        ExprType exprType = GREATERTHANEQUALEXPRESSION;
-
     public:
         Value* getValue();
     };
@@ -238,34 +207,36 @@ namespace valkyrie{
     // Primitives
     class LongValueExpression: public PrimitiveValue {
     private:
-        ExprType exprType = LONGVALUEEXPRESSION;
         long data;
 
     public:
+        LongValueExpression(long data);
         long getData();
         void setData(long);
         Value* getValue();
+        ExprType getType(){ return ExprType::LONGVALUEEXPRESSION; }
     };
 
 
     class DoubleValueExpression: public PrimitiveValue {
     private:
-        ExprType exprType = DOUBLEVALUEEXPRESSION;
         double data;
 
     public:
+        DoubleValueExpression(double data);
         double getData();
         void setData(double);
         Value* getValue();
+        ExprType getType(){ return ExprType::DOUBLEVALUEEXPRESSION; }
     };
 
 
     class StringValueExpression: public PrimitiveValue {
     private:
-        ExprType exprType = STRINGVALUEEXPRESSION;
         string* data;
 
     public:
+        StringValueExpression(string* data);
         string* getData();
         void setData(string*);
         Value* getValue();
@@ -274,7 +245,6 @@ namespace valkyrie{
 
     class DateValueExpression: public PrimitiveValue {
     private:
-        ExprType exprType = DATEVALUEEXPRESSION;
         string* data;
 
     public:
@@ -289,13 +259,13 @@ namespace valkyrie{
     // This represents a column
     class ColExpression: public Expression {
     private:
-        ExprType exprType = COLEXPRESSION;
         string colname;
-
     public:
+        ColExpression(string name);
         string getColName();
         void setColName(string);
-        Value getValue();
+        Value* getValue();
+        ExprType getType(){ return ExprType::COLEXPRESSION; }
     };
 }
 
