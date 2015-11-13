@@ -190,6 +190,7 @@ namespace valkyrie{
     private:
     public:
         Value* getValue();
+        ExprType getType(){ return ExprType::GREATERTHANEXPRESSION; }
     };
 
     class GreaterThanEqualExpression: public CmpExpression {

@@ -200,7 +200,7 @@ Value* GreaterThanExpression::getValue() {
     assert(leftExpression->getType() == rightExpression->getType());
 
     IRBuilder<>* builder = codegen::getBuilder();
-    switch(leftExpression->getType()) {
+    switch(rightExpression->getType()) {
         case LONGVALUEEXPRESSION:
             return builder->CreateICmpSGT(leftExpression->getValue(), rightExpression->getValue());
         case DOUBLEVALUEEXPRESSION:
@@ -333,12 +333,8 @@ Value* ColExpression::getValue() {
 
     Value *indices[1];
     indices[0] = ConstantInt::get(Type::getInt32Ty(getGlobalContext()), pos);
-    ArrayRef<Value *> indicesRef(indices);
-
-    Value *data = builder->CreateLoad(
-            builder->CreateInBoundsGEP(tupleptr, indicesRef)
-    );
-
+    ArrayRef<Value*> indicesRef(indices);
+    Value *data = builder->CreateLoad(builder->CreateInBoundsGEP(tupleptr, indicesRef));
     switch(dt){
         case LONG:
             return data;
@@ -347,7 +343,6 @@ Value* ColExpression::getValue() {
         case STRING:
         case DATE:
             break;
-
     }
     return NULL;
 }

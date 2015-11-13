@@ -5,12 +5,12 @@
 
 using namespace std;
 
-typedef enum {
+enum DataType {
     LONG,
     DOUBLE,
     STRING,
     DATE
-} DataType;
+};
 
 typedef int64_t LeafValue;
 

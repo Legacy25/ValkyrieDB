@@ -166,11 +166,11 @@ void codegen::selectConsume(Expression *clause, valkyrie::Operator *parent){
     Value* condV = clause->getValue();
     BasicBlock *cond_true = BasicBlock::Create(context, "If"+to_string(nameCtr++), mainFunction);
     //If the tuple does not satisfy the where condition and also after returning from parent produce
-    BasicBlock *merge = BasicBlock::Create(context, "continue"+to_string(nameCtr));
+    BasicBlock *merge = BasicBlock::Create(context, "continue"+to_string(nameCtr), mainFunction);
     builder->CreateCondBr(condV, cond_true, merge);
     builder->SetInsertPoint(cond_true);
-    if(condV){
-        parent->produce();
+    if(parent != NULL){
+        parent->consume();
     }
     builder->CreateBr(merge);
     builder->SetInsertPoint(merge);

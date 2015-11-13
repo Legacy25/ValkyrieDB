@@ -11,9 +11,12 @@ ExpressionParser::ExpressionParser(){
 	arithmeticOperators.insert("-");
 	arithmeticOperators.insert("*");
 	arithmeticOperators.insert("=");
+	logicalOperators.insert(">");
 }
 
-Expression* ExpressionParser::logicalExpression(std::string s){
+BinaryExpression* ExpressionParser::logicalExpression(std::string s){
+	if(s == ">")
+		return new GreaterThanExpression();
 	return NULL;
 }
 
@@ -62,7 +65,10 @@ Expression* ExpressionParser::parseExpression(std::string exp){
 			Expression *left = parseExpression(tokens[i-1]);
 			Expression *right = parseExpression(tokens[i+1]);
 			//TODO generalize to Expression
-			BinaryExpression *op = arithemeticExpression(tokens[i]);
+			BinaryExpression *op = NULL;
+			if(arithmeticOperators.find(tokens[i]) != arithmeticOperators.end())
+				op = arithemeticExpression(tokens[i]);
+			else op = logicalExpression(tokens[i]);
 			op->setLeftExpression(left);
 			op->setRightExpression(right);
 			return op;

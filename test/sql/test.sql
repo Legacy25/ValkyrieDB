@@ -1,1 +1,1 @@
-select * from nation where nationkey = 12;
+select * from nation where nationkey > 2;
