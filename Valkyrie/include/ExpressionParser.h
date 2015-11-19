@@ -19,8 +19,7 @@ namespace valkyrie{
 		double extractDouble(std::string s);
 		valkyrie::Expression* leafExpression(std::string s);
 		valkyrie::BinaryExpression* logicalExpression(std::string s);
-		//TODO change to Expression
-		valkyrie::BinaryExpression* arithemeticExpression(std::string s);
+		valkyrie::BinaryExpression* arithmeticExpression(std::string s);
 		valkyrie::Expression* parseExpression(std::string s);
 	public:
 		ExpressionParser();

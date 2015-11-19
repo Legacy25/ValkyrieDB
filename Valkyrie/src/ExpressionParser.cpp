@@ -10,30 +10,52 @@ ExpressionParser::ExpressionParser(){
 	arithmeticOperators.insert("+");
 	arithmeticOperators.insert("-");
 	arithmeticOperators.insert("*");
-	arithmeticOperators.insert("=");
+	arithmeticOperators.insert("/");
+	logicalOperators.insert("=");
+	logicalOperators.insert("<>");
 	logicalOperators.insert(">");
+	logicalOperators.insert(">=");
+	logicalOperators.insert("<");
+	logicalOperators.insert("<=");
+	logicalOperators.insert("AND");
+	logicalOperators.insert("OR");
 }
 
 BinaryExpression* ExpressionParser::logicalExpression(std::string s){
+	if(s == "=")
+		return new EqualExpression();
+	if(s == "<>")
+		return new NotEqualExpression();
 	if(s == ">")
 		return new GreaterThanExpression();
+	if(s == ">=")
+		return new GreaterThanEqualExpression();
+	if(s == "<")
+		return new LessThanExpression();
+	if(s == "<=")
+		return new LessThanEqualExpression();
+	if(s == "AND")
+		return new AndExpression();
+	if(s == "OR")
+		return new OrExpression();
 	return NULL;
 }
 
-BinaryExpression* ExpressionParser::arithemeticExpression(std::string s){
-	if(s == "=")
-		return new EqualExpression();
-	else if(s == "+")
+BinaryExpression* ExpressionParser::arithmeticExpression(std::string s){
+	if(s == "+")
 		return new AdditionExpression();
-	else if(s == "-")
+	if(s == "-")
 		return new SubtractionExpression();
-	return new MultiplicationExpression();
+	if(s == "*")
+		return new MultiplicationExpression();
+	return new DivisionExpression();
 }
 
 Expression* ExpressionParser::leafExpression(std::string s){
 	std::cout << "lead : " << s << std::endl;
 	if(s == "*"){
-		return NULL;
+		//TODO check this, replace for all columns
+		return new ColExpression(s);
 	}else if(s[0] == '\'' && s[s.length()-1] == '\''){
 		return new StringValueExpression(&s);
 		//add starts with date
@@ -51,7 +73,6 @@ Expression* ExpressionParser::leafExpression(std::string s){
 	return NULL;
 }
 
-//only arithemetic operators done
 Expression* ExpressionParser::parseExpression(std::string exp){
 	std::cout << "string : " << exp << std::endl;
 	std::vector<std::string> tokens = splitString(exp, ' ');
@@ -67,7 +88,7 @@ Expression* ExpressionParser::parseExpression(std::string exp){
 			//TODO generalize to Expression
 			BinaryExpression *op = NULL;
 			if(arithmeticOperators.find(tokens[i]) != arithmeticOperators.end())
-				op = arithemeticExpression(tokens[i]);
+				op = arithmeticExpression(tokens[i]);
 			else op = logicalExpression(tokens[i]);
 			op->setLeftExpression(left);
 			op->setRightExpression(right);
@@ -86,8 +107,8 @@ std::vector<Expression*> ExpressionParser::parse(std::string exp){
 		//trim expression string
 		Expression* e = parseExpression(tokens[i]);
 		exps.push_back(e);
-		std::cout << "Expressojtype: " << e->getType() << "left " << ((BinaryExpression*)e)->getLeftExpression()->getType()
-		 << "right " << ((BinaryExpression*)e)->getRightExpression()->getType() << std::endl;
+		//std::cout << "Expressiontype: " << e->getType() << "left " << ((BinaryExpression*)e)->getLeftExpression()->getType()
+		 //<< "right " << ((BinaryExpression*)e)->getRightExpression()->getType() << std::endl;
 	}
 	return exps;
 }
