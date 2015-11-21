@@ -79,13 +79,16 @@ Expression* ExpressionParser::parseExpression(std::string exp){
 	std::cout << tokens.size() << std::endl;
 	if(tokens.size() == 1)
 		return leafExpression(tokens[0]);
+	if(tokens.size() > 3 && tokens[tokens.size()-2] == "AS"){
+		std::size_t pos = exp.find(" AS ");
+		return parseExpression(exp.substr(0, pos));
+	}
 	for(int i = 0; i < tokens.size(); i++){
 		if(logicalOperators.find(tokens[i]) != logicalOperators.end() || 
 			arithmeticOperators.find(tokens[i]) != arithmeticOperators.end()){
 			std::cout << tokens[i] << std::endl;
 			Expression *left = parseExpression(tokens[i-1]);
 			Expression *right = parseExpression(tokens[i+1]);
-			//TODO generalize to Expression
 			BinaryExpression *op = NULL;
 			if(arithmeticOperators.find(tokens[i]) != arithmeticOperators.end())
 				op = arithmeticExpression(tokens[i]);

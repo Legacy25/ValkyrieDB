@@ -259,7 +259,14 @@ DataType codegen::getAttType(string colname){
     return gschema->getAttributeType(colname);
 }
 
-Value* codegen::getTupleptr()
-{
+Value* codegen::getTupleptr() {
     return tuplePtr;
+}
+
+void codegen::setSchema(Schema *schema) {
+    gschema = schema;
+}
+
+Schema* codegen::getSchema(){
+    return gschema;
 }

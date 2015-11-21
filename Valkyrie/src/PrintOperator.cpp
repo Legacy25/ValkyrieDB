@@ -7,7 +7,7 @@ PrintOperator::PrintOperator(std::vector<std::string> expressions, std::vector<O
 	this->type = "PRINT";
 	this->expressions = expressions;
 	schema = children[0]->getSchema();
-	types = (int *)&(schema->getTypes()->front());
+	types = (int *)&(schema->getTypes().front());
 }
 
 void PrintOperator::produce(){

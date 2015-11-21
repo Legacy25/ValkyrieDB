@@ -15,4 +15,4 @@ WHERE
 GROUP BY lineitem.orderkey, orders.orderdate, orders.shippriority 
 ORDER BY revenue desc, orders.orderdate;*/
 
-select * from nation where nationkey > 2;
+select name from nation where nationkey > 2;

@@ -27,6 +27,8 @@ namespace codegen {
     void scanConsume(Schema&, valkyrie::Operator* parent);
     void selectConsume(Expression* expressions, valkyrie::Operator *parent);
     void printConsume(int*);
+    void setSchema(Schema *schema);
+    Schema* getSchema();
 }
 
 #endif //CDB_CODEGEN_H

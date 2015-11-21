@@ -5,8 +5,7 @@
 
 #include "../include/Schema.h"
 #include "../include/Operator.h"
-//#include "../../../../../../usr/include/c++/4.8.3/x86_64-redhat-linux/bits/c++config.h"
-//#include "../../../../../../usr/lib/gcc/x86_64-redhat-linux/4.8.3/include/stddef.h"
+#include <algorithm>
 
 using namespace std;
 using namespace valkyrie;
@@ -42,6 +41,8 @@ string Schema::attrsVecsToCommaSepString(const vector<string>& attr, const vecto
     return line;
 }
 
+Schema::Schema(string tablename) : tablename(tablename) {}
+
 Schema::Schema(string tablename, string datafile)
 : tablename(tablename), datafile(datafile) {
     materialized = false;
@@ -50,6 +51,7 @@ Schema::Schema(string tablename, string datafile)
 void Schema::addAttribute(string attr, DataType t) {
     attributes.push_back(attr);
     types.push_back(t);
+    colMap.insert(make_pair(attr, new ColExpression(attr, attributes.size()-1)));
 }
 
 void Schema::materialize() {
@@ -103,17 +105,28 @@ bool Schema::isMaterialized() const {
 }
 
 ostream& operator<<(ostream &stream, const  Schema &schema) {
-    string attrs = schema.attrsVecsToCommaSepString(schema.getAttributes(), *(schema.getTypes()));
-    return stream << schema.getTableName() << " : " << schema.getDataFile() << endl
-    << attrs;
+    string attrs = schema.attrsVecsToCommaSepString(schema.getAttributes(), schema.getTypes());
+    return stream << schema.getTableName() << " : " << schema.getDataFile() << endl << attrs;
+}
+
+void Schema::setTuples(vector<LeafValue*> tuples) {
+    this->tuples = tuples;
+}
+
+vector<LeafValue *> Schema::getTuples() {
+    return this->tuples;
 }
 
 uint64_t Schema::getTuplePtr() const {
     return (uint64_t) &tuples[0];
 }
 
-const vector<DataType>* Schema::getTypes() const{
-    return &types;
+void Schema::setTypes(vector<DataType> types) {
+    this->types = types;
+}
+
+const vector<DataType> Schema::getTypes() const{
+    return types;
 }
 
 std::string Schema::getDataFile() const{
@@ -147,4 +160,12 @@ DataType Schema::getAttributeType(string colName) const {
 
 size_t Schema::getTupleCount() const {
     return tuples.size();
+}
+
+std::unordered_map<std::string, valkyrie::Expression*> Schema::getColumnMap(){
+    return this->colMap;
+};
+
+void Schema::setColumnMap(unordered_map<string, valkyrie::Expression *> m) {
+    this->colMap = m;
 }

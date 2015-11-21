@@ -3,8 +3,6 @@
 #include "llvm/IR/IRBuilder.h"
 #include "../include/Expression.h"
 #include "../include/Codegen.h"
-//#include "../../../../../../usr/include/c++/4.8.3/x86_64-redhat-linux/bits/c++config.h"
-//#include "../../../../../../usr/lib/gcc/x86_64-redhat-linux/4.8.3/include/stddef.h"
 
 using namespace valkyrie;
 using namespace llvm;
@@ -24,9 +22,6 @@ Expression *BinaryExpression::getRightExpression() {
 void BinaryExpression::setRightExpression(Expression *expression) {
     rightExpression = expression;
 }
-
-
-
 
 Value* AdditionExpression::getValue() {
     assert(leftExpression != NULL);
@@ -60,9 +55,6 @@ Value* DivisionExpression::getValue() {
     return builder->CreateFDiv(leftExpression->getValue(), rightExpression->getValue());
 }
 
-
-
-
 Value* AndExpression::getValue() {
     assert(leftExpression != NULL);
     assert(rightExpression != NULL);
@@ -78,7 +70,6 @@ Value* OrExpression::getValue() {
     IRBuilder<>* builder = codegen::getBuilder();
     return builder->CreateOr(leftExpression->getValue(), rightExpression->getValue());
 }
-
 
 /**
  * TODO The comparisions will be type dependent, now only works for longs and doubles
@@ -286,9 +277,6 @@ Value* LessThanEqualExpression::getValue() {
     return NULL;
 }
 
-
-
-
 LongValueExpression::LongValueExpression(long data){
     this->data = data;
 }
@@ -323,6 +311,27 @@ Value* DateValueExpression::getValue() {
 
 ColExpression::ColExpression(std::string name){
     colname = name;
+}
+
+ColExpression::ColExpression(string name, int colPos) {
+    colname = name;
+    index = colPos;
+}
+
+void ColExpression::setColPos(int pos){
+    this->index = pos;
+}
+
+int ColExpression::getColPos(){
+    return this->index;
+}
+
+string ColExpression::getColName() {
+    return this->colname;
+}
+
+void ColExpression::setColName(string name) {
+    this->colname = name;
 }
 
 Value* ColExpression::getValue() {
