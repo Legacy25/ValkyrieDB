@@ -158,3 +158,8 @@ long ExpressionParser::extractLong(std::string s){
 double ExpressionParser::extractDouble(std::string s){
 	return std::atof(s.c_str());
 }
+
+DataType ExpressionParser::evaluateType(Expression *exp) {
+	//TODO implement type evaluation
+	return DataType::STRING;
+}

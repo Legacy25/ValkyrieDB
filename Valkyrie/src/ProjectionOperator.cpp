@@ -20,21 +20,41 @@ void ProjectionOperator::updateSchema(){
 	assert(projectionClauses.size() == expressions.size());
     Schema *old = codegen::getSchema();
     Schema *schema = new Schema(old->getTableName());
-    schema->setTypes(old->getTypes());
     schema->setTuples(old->getTuples());
     unordered_map<string, Expression*> nschema;
+	//
+	vector<string> att = old->getAttributes();
+	for(int i = 0; i < att.size(); i++)
+		std::cout << " ;; " << att[i];
+	std::cout << std::endl;
+	std::cout << "----------------" << std::endl;
+	for(int i = 0; i < expressions.size(); i++)
+		std::cout << " ;; " << expressions[i] << " .. " << projectionClauses[i]->toString();
+	std::cout << std::endl;
+	//
+	ExpressionParser parser;
 	for(int i = 0; i < expressions.size(); i++){
 		std::size_t pos = expressions[i].find(" AS ");
         //TODO check the random column name assignment
 		std::string colName = pos == std::string::npos ? "default_" + std::to_string(i) : expressions[i].substr(0, pos);
-		updateExpesssion(projectionClauses[i], old->getColumnMap());
+		updateExpression(projectionClauses[i], old->getColumnMap());
         nschema.insert(std::make_pair(colName, projectionClauses[i]));
+		schema->addAttribute(colName, parser.evaluateType(projectionClauses[i]));
 	}
 	schema->setColumnMap(nschema);
+	//
+	std::cout << "updated " << std::endl;
+ 	std::vector<string> a = schema->getAttributes();
+	std::vector<DataType> t = schema->getTypes();
+	std::unordered_map<string, Expression*> m = schema->getColumnMap();
+	for(int i = 0; i < a.size(); i++)
+		std::cout << " ;; " << a[i] << " // " << m[a[i]]->toString() << "//" << t[i];
+	std::cout << std::endl;
+	//
     codegen::setSchema(schema);
 }
 
-void ProjectionOperator::updateExpesssion(Expression *newExp, unordered_map<std::string, Expression *> m) {
+void ProjectionOperator::updateExpression(Expression *newExp, unordered_map<std::string, Expression *> m) {
 	ExprType t = newExp->getType();
 	if(t != ExprType::COLEXPRESSION && t != ExprType::DOUBLEVALUEEXPRESSION && t != ExprType::STRINGVALUEEXPRESSION &&
 			t != ExprType::LONGVALUEEXPRESSION && t != ExprType::DATEVALUEEXPRESSION){
@@ -47,7 +67,7 @@ void ProjectionOperator::updateExpesssion(Expression *newExp, unordered_map<std:
 				b->setLeftExpression(m[col->getColName()]);
 			}
 		} else {
-			updateExpesssion(b->getLeftExpression(), m);
+			updateExpression(b->getLeftExpression(), m);
 		}
 		if(b->getRightExpression()->getType() == ExprType::COLEXPRESSION){
 			ColExpression* col = (ColExpression*)b->getRightExpression();
@@ -56,7 +76,12 @@ void ProjectionOperator::updateExpesssion(Expression *newExp, unordered_map<std:
 				b->setRightExpression(m[col->getColName()]);
 			}
 		} else {
-			updateExpesssion(b->getRightExpression(), m);
+			updateExpression(b->getRightExpression(), m);
+		}
+	} else {
+		if(t == ExprType::COLEXPRESSION){
+			ColExpression* col = (ColExpression*)m[((ColExpression*)newExp)->getColName()];
+			((ColExpression*)newExp)->setColPos(col->getColPos());
 		}
 	}
 }

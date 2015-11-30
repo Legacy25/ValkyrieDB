@@ -167,5 +167,12 @@ std::unordered_map<std::string, valkyrie::Expression*> Schema::getColumnMap(){
 };
 
 void Schema::setColumnMap(unordered_map<string, valkyrie::Expression *> m) {
+    cout << "setting schema with new map of size " << m.size() << endl;
     this->colMap = m;
+}
+
+Expression *Schema::getAttrExpression(string colName) {
+    if(colMap.find(colName) == colMap.end())
+        return NULL;
+    return colMap[colName];
 }

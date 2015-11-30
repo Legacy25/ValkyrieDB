@@ -24,6 +24,7 @@ namespace codegen {
     Value* getTupleptr();
     size_t getAttPos(string colname);
     DataType getAttType(string colname);
+    DataType getAttType(int colpos);
     void scanConsume(Schema&, valkyrie::Operator* parent);
     void selectConsume(Expression* expressions, valkyrie::Operator *parent);
     void printConsume(int*);

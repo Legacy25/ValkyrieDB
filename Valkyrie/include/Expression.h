@@ -265,7 +265,11 @@ namespace valkyrie{
         void setColName(string);
         Value* getValue();
         ExprType getType(){ return ExprType::COLEXPRESSION; }
-        string toString(){return colname;}
+        string toString(){
+            if(index != -1)
+                return colname + "(" + std::to_string(index) + ")";
+            return colname;
+        }
     };
 }
 

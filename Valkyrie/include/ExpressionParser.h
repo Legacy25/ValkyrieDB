@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <vector>
 #include "Expression.h"
+#include "DataTypes.h"
 
 namespace valkyrie{
 	class ExpressionParser {
@@ -24,6 +25,7 @@ namespace valkyrie{
 	public:
 		ExpressionParser();
 		std::vector<valkyrie::Expression*> parse(std::string exp);
+		DataType evaluateType(Expression* exp);
 	};
 }
 

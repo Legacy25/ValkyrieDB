@@ -1,5 +1,6 @@
 #include "../include/ScanOperator.h"
 #include "../include/Codegen.h"
+#include <unordered_map>
 
 using namespace valkyrie;
 
@@ -21,6 +22,12 @@ void ScanOperator::convertToSchema(){
 		std::string colType = expressions[i].substr(t+1);
 		schema->addAttribute(colName, mapType(colType));
 	}
+	//
+	std::cout << "scanning done " << std::endl;
+	unordered_map<string, Expression*> m = this->schema->getColumnMap();
+	for(unordered_map<string, Expression*>::iterator it = m.begin(); it != m.end();it++)
+		std::cout << " ;; " << it->first << " // " << it->second->toString();
+	std::cout << std::endl;
 }
 
 void ScanOperator::produce(){

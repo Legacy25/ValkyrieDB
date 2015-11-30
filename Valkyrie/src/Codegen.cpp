@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/IRBuilder.h"
@@ -176,7 +177,31 @@ void codegen::selectConsume(Expression *clause, valkyrie::Operator *parent){
 }
 
 void codegen::printConsume(int *types) {
-    Value *loopVar =
+    std::vector<string> cols = gschema->getAttributes();
+    std::vector<DataType> t = gschema->getTypes();
+    cout << "column printing size " << cols.size() << endl;
+    for(int i = 0; i < cols.size(); i++){
+        std::cout << "printing " << cols[i] << endl;
+        std::cout << "type " << t[i] << endl;
+        Expression* exp = gschema->getAttrExpression(cols[i]);
+        switch(t[i]){
+            case DataType::DOUBLE:
+                builder->CreateCall(printfFunc, vector<Value*>({doubleFmt, exp->getValue()}));
+                break;
+            case DataType::LONG:
+                builder->CreateCall(printfFunc, vector<Value*>({longFmt, exp->getValue()}));
+                break;
+            case DataType::STRING:
+                builder->CreateCall(printfFunc, vector<Value*>({stringFmt, exp->getValue()}));
+                break;
+            case DataType::DATE:
+                builder->CreateCall(printfFunc, vector<Value*>({dateFmt, exp->getValue()}));
+                break;
+        }
+        builder->CreateCall(printfFunc, vector<Value*>({newLine}));
+    }
+
+    /*Value *loopVar =
             builder->CreateAlloca(
                     int32Type,
                     ConstantInt::get(int32Type, 1),
@@ -197,13 +222,9 @@ void codegen::printConsume(int *types) {
     indices[0] = i;
     ArrayRef<Value *> indicesRef(indices);
 
-    Value *type = builder->CreateLoad(
-            builder->CreateInBoundsGEP(typesPtr, indicesRef)
-    );
+    Value *type = builder->CreateLoad(builder->CreateInBoundsGEP(typesPtr, indicesRef));
 
-    Value *data = builder->CreateLoad(
-            builder->CreateInBoundsGEP(tuplePtr, indicesRef)
-    );
+    Value *data = builder->CreateLoad(builder->CreateInBoundsGEP(tuplePtr, indicesRef));
 
     BasicBlock *afterSwitch = BasicBlock::Create(context, "afterswitch"+to_string(nameCtr++), mainFunction);
     BasicBlock *longCase = BasicBlock::Create(context, "longcase"+to_string(nameCtr++), mainFunction);
@@ -244,7 +265,7 @@ void codegen::printConsume(int *types) {
     builder->CreateCondBr(cmp, loopBody, afterLoop);
 
     builder->SetInsertPoint(afterLoop);
-    builder->CreateCall(printfFunc, vector<Value*>({newLine}));
+    builder->CreateCall(printfFunc, vector<Value*>({newLine}));*/
 }
 
 IRBuilder<>* codegen::getBuilder() {
@@ -259,11 +280,16 @@ DataType codegen::getAttType(string colname){
     return gschema->getAttributeType(colname);
 }
 
+DataType codegen::getAttType(int colPos){
+    return gschema->getTypes()[colPos];
+}
+
 Value* codegen::getTupleptr() {
     return tuplePtr;
 }
 
 void codegen::setSchema(Schema *schema) {
+    std::cout << "size after projection change: " << schema->getAttributes().size() << std::endl;
     gschema = schema;
 }
 

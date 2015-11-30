@@ -336,12 +336,10 @@ void ColExpression::setColName(string name) {
 
 Value* ColExpression::getValue() {
     IRBuilder<>* builder = codegen::getBuilder();
-    std::size_t pos = codegen::getAttPos(colname);
-    DataType dt = codegen::getAttType(colname);
+    DataType dt = codegen::getAttType(index);
     Value* tupleptr = codegen::getTupleptr();
-
     Value *indices[1];
-    indices[0] = ConstantInt::get(Type::getInt32Ty(getGlobalContext()), pos);
+    indices[0] = ConstantInt::get(Type::getInt32Ty(getGlobalContext()), (uint64_t) index);
     ArrayRef<Value*> indicesRef(indices);
     Value *data = builder->CreateLoad(builder->CreateInBoundsGEP(tupleptr, indicesRef));
     switch(dt){

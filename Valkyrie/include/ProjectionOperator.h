@@ -10,7 +10,7 @@ namespace valkyrie{
 	private:
 		std::vector<Expression*> projectionClauses;
 		void updateSchema();
-		void updateExpesssion(valkyrie::Expression* newExp, unordered_map<std::string, valkyrie::Expression*> m);
+		void updateExpression(valkyrie::Expression* newExp, unordered_map<std::string, valkyrie::Expression*> m);
 	public:
 		ProjectionOperator(std::vector<std::string> expressions, std::vector<Operator*> children);
 		void consume();
