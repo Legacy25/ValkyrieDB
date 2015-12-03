@@ -198,8 +198,8 @@ void codegen::printConsume(int *types) {
                 builder->CreateCall(printfFunc, vector<Value*>({dateFmt, exp->getValue()}));
                 break;
         }
-        builder->CreateCall(printfFunc, vector<Value*>({newLine}));
     }
+    builder->CreateCall(printfFunc, vector<Value*>({newLine}));
 }
 
 IRBuilder<>* codegen::getBuilder() {
