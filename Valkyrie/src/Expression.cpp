@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/IRBuilder.h"
@@ -318,12 +319,25 @@ ColExpression::ColExpression(string name, int colPos) {
     index = colPos;
 }
 
+ColExpression::ColExpression(string name, int colPos, DataType type) {
+    this->colname = name;
+    this->index = colPos;
+    this->type = type;
+}
+
 void ColExpression::setColPos(int pos){
     this->index = pos;
 }
 
 int ColExpression::getColPos(){
     return this->index;
+}
+
+void ColExpression::setType(DataType type){
+    this->type = type;
+}
+DataType ColExpression::getDataType(){
+    return this->type;
 }
 
 string ColExpression::getColName() {

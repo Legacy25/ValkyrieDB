@@ -5,6 +5,7 @@
 #include <stack>
 #include <algorithm>
 #include "llvm/IR/Value.h"
+#include "DataTypes.h"
 
 using namespace llvm;
 using namespace std;
@@ -256,18 +257,22 @@ namespace valkyrie{
     private:
         string colname;
         int index = -1;
+        DataType type;
     public:
         ColExpression(string name);
         ColExpression(string name, int colPos);
+        ColExpression(string name, int colPos, DataType type);
         void setColPos(int pos);
         int getColPos();
+        void setType(DataType type);
+        DataType getDataType();
         string getColName();
         void setColName(string);
         Value* getValue();
         ExprType getType(){ return ExprType::COLEXPRESSION; }
         string toString(){
             if(index != -1)
-                return colname + "(" + std::to_string(index) + ")";
+                return colname + "(" + std::to_string(index) + ", " + std::to_string(type) + ")";
             return colname;
         }
     };

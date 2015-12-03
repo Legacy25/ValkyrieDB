@@ -82,6 +82,7 @@ void ProjectionOperator::updateExpression(Expression *newExp, unordered_map<std:
 		if(t == ExprType::COLEXPRESSION){
 			ColExpression* col = (ColExpression*)m[((ColExpression*)newExp)->getColName()];
 			((ColExpression*)newExp)->setColPos(col->getColPos());
+			((ColExpression*)newExp)->setType(col->getDataType());
 		}
 	}
 }

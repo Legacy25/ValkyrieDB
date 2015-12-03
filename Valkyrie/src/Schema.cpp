@@ -51,7 +51,7 @@ Schema::Schema(string tablename, string datafile)
 void Schema::addAttribute(string attr, DataType t) {
     attributes.push_back(attr);
     types.push_back(t);
-    colMap.insert(make_pair(attr, new ColExpression(attr, attributes.size()-1)));
+    colMap.insert(make_pair(attr, new ColExpression(attr, attributes.size()-1, t)));
 }
 
 void Schema::materialize() {
