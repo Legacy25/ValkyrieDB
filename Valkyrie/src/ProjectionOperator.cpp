@@ -5,11 +5,21 @@
 
 using namespace valkyrie;
 
-ProjectionOperator::ProjectionOperator(std::vector<std::string> expressions, std::vector<Operator*> children) : Operator(children){
+ProjectionOperator::ProjectionOperator(std::vector<std::string> expressionList, std::vector<Operator*> children) : Operator(children){
 	this->type = "PROJECT";
-	this->expressions = expressions;
+	this->expressions = expressionList;
 	schema = children[0]->getSchema();
 	ExpressionParser parser;
+	bool allFound = false;
+	vector<string> attrs = schema->getAttributes();
+	for(int i = 0; i < expressions.size(); i++){
+		if(expressions[i] == "*"){
+			expressions.erase(expressions.begin()+i);
+			if(!allFound)
+				expressions.insert(expressions.begin()+i, attrs.begin(), attrs.end());
+			allFound = true;
+		}
+	}
 	for(int i = 0; i < expressions.size(); i++){
 		std::vector<Expression*> exps = parser.parse(expressions[i]);
 		projectionClauses.insert(projectionClauses.end(), exps.begin(), exps.end());
