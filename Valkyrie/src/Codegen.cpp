@@ -179,10 +179,7 @@ void codegen::selectConsume(Expression *clause, valkyrie::Operator *parent){
 void codegen::printConsume(int *types) {
     std::vector<string> cols = gschema->getAttributes();
     std::vector<DataType> t = gschema->getTypes();
-    cout << "column printing size " << cols.size() << endl;
     for(int i = 0; i < cols.size(); i++){
-        std::cout << "printing " << cols[i] << endl;
-        std::cout << "type " << t[i] << endl;
         Expression* exp = gschema->getAttrExpression(cols[i]);
         switch(t[i]){
             case DataType::DOUBLE:
@@ -223,7 +220,6 @@ Value* codegen::getTupleptr() {
 }
 
 void codegen::setSchema(Schema *schema) {
-    std::cout << "size after projection change: " << schema->getAttributes().size() << std::endl;
     gschema = schema;
 }
 

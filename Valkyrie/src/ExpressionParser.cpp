@@ -52,7 +52,6 @@ BinaryExpression* ExpressionParser::arithmeticExpression(std::string s){
 }
 
 Expression* ExpressionParser::leafExpression(std::string s){
-	std::cout << "lead : " << s << std::endl;
 	if(s == "*"){
 		//TODO check this, replace for all columns
 		return new ColExpression(s);
@@ -61,22 +60,17 @@ Expression* ExpressionParser::leafExpression(std::string s){
 		//add starts with date
 		//string expression
 	}else if(isLong(s)){
-		std::cout << "int detected : " << std::endl;
 		return new LongValueExpression(extractLong(s));
 	}else if(isDouble(s)){
-		std::cout << "double detected : " << std::endl;
 		return new DoubleValueExpression(extractDouble(s));
 	}else{
-		std::cout << "colimn detected : " << std::endl;
 		return new ColExpression(s);
 	}
 	return NULL;
 }
 
 Expression* ExpressionParser::parseExpression(std::string exp){
-	std::cout << "string : " << exp << std::endl;
 	std::vector<std::string> tokens = splitString(exp, ' ');
-	std::cout << tokens.size() << std::endl;
 	if(tokens.size() == 1)
 		return leafExpression(tokens[0]);
 	if(tokens.size() > 3 && tokens[tokens.size()-2] == "AS"){
@@ -86,7 +80,6 @@ Expression* ExpressionParser::parseExpression(std::string exp){
 	for(int i = 0; i < tokens.size(); i++){
 		if(logicalOperators.find(tokens[i]) != logicalOperators.end() || 
 			arithmeticOperators.find(tokens[i]) != arithmeticOperators.end()){
-			std::cout << tokens[i] << std::endl;
 			Expression *left = parseExpression(tokens[i-1]);
 			Expression *right = parseExpression(tokens[i+1]);
 			BinaryExpression *op = NULL;
@@ -110,8 +103,6 @@ std::vector<Expression*> ExpressionParser::parse(std::string exp){
 		//trim expression string
 		Expression* e = parseExpression(tokens[i]);
 		exps.push_back(e);
-		//std::cout << "Expressiontype: " << e->getType() << "left " << ((BinaryExpression*)e)->getLeftExpression()->getType()
-		 //<< "right " << ((BinaryExpression*)e)->getRightExpression()->getType() << std::endl;
 	}
 	return exps;
 }
@@ -135,9 +126,8 @@ bool ExpressionParser::isDouble(std::string s){
 }
 
 bool ExpressionParser::isLong(std::string s){
-	//check for 2 or more decimal points
 	for(int i = 0; i < s.length(); i++)
-		if((s[i] < '0' || s[i] > '9') && s[i] != '.')
+		if(s[i] < '0' || s[i] > '9')
 			return false;
 	return true;
 }

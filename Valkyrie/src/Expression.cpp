@@ -356,7 +356,6 @@ Value* ColExpression::getValue() {
     indices[0] = ConstantInt::get(Type::getInt32Ty(getGlobalContext()), (uint64_t) index);
     ArrayRef<Value*> indicesRef(indices);
     Value *data = builder->CreateLoad(builder->CreateInBoundsGEP(tupleptr, indicesRef));
-    cout << "col generation " << this->colname << " ;; " << dt << endl;
     switch(dt){
         case LONG:
             return data;

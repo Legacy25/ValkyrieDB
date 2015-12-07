@@ -15,4 +15,4 @@ WHERE
 GROUP BY lineitem.orderkey, orders.orderdate, orders.shippriority 
 ORDER BY revenue desc, orders.orderdate;*/
 
-select orderstatus from ORDERS;
+select suppkey from supplier where suppkey > 4;

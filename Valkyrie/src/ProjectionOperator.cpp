@@ -32,16 +32,6 @@ void ProjectionOperator::updateSchema(){
     Schema *schema = new Schema(old->getTableName());
     schema->setTuples(old->getTuples());
     unordered_map<string, Expression*> nschema;
-	//
-	vector<string> att = old->getAttributes();
-	for(int i = 0; i < att.size(); i++)
-		std::cout << " ;; " << att[i];
-	std::cout << std::endl;
-	std::cout << "----------------" << std::endl;
-	for(int i = 0; i < expressions.size(); i++)
-		std::cout << " ;; " << expressions[i] << " .. " << projectionClauses[i]->toString();
-	std::cout << std::endl;
-	//
 	ExpressionParser parser;
 	for(int i = 0; i < expressions.size(); i++){
 		std::size_t pos = expressions[i].find(" AS ");
@@ -52,15 +42,6 @@ void ProjectionOperator::updateSchema(){
 		schema->addAttribute(colName, parser.evaluateType(projectionClauses[i]));
 	}
 	schema->setColumnMap(nschema);
-	//
-	std::cout << "updated " << std::endl;
- 	std::vector<string> a = schema->getAttributes();
-	std::vector<DataType> t = schema->getTypes();
-	std::unordered_map<string, Expression*> m = schema->getColumnMap();
-	for(int i = 0; i < a.size(); i++)
-		std::cout << " ;; " << a[i] << " // " << m[a[i]]->toString() << "//" << t[i];
-	std::cout << std::endl;
-	//
     codegen::setSchema(schema);
 }
 
