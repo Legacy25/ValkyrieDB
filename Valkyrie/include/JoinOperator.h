@@ -14,6 +14,7 @@ namespace valkyrie {
         Expression* joinClause;
         vector<ColExpression*> left;
         vector<ColExpression*> right;
+        char status = 0;
 
         void updateExpression(Expression* exp, unordered_map<string, Expression*> lm, unordered_map<string, Expression*>rm
                 , string ltable, string rtable);

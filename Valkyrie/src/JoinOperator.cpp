@@ -18,14 +18,27 @@ JoinOperator::JoinOperator(std::vector<std::string> expressionList, std::vector<
 }
 
 void JoinOperator::consume() {
-    children[0]->consume();
-    cout << "JOIN DEBUG ====\nLEFT\n" << endl;
-    for(auto i : left) {
-        cout << i->getColName() << endl;
-    }
-    cout << "\nRIGHT\n" << endl;
-    for(auto i : right) {
-        cout << i->getColName() << endl;
+    switch(status) {
+        case 0:
+            cout << "JOIN DEBUG ====\nLEFT\n" << endl;
+            for(auto i : left) {
+                cout << i->getColName() << endl;
+            }
+            status = 1;
+            break;
+        case 1:
+            cout << "\nRIGHT\n" << endl;
+            for(auto i : right) {
+                cout << i->getColName() << endl;
+            }
+            status = 2;
+            break;
+        case 2:
+            cout << "\nDONE ======\n" << endl;
+            break;
+        default:
+            cout << "Unknown status: " << status << endl;
+            exit(-1);
     }
 }
 
