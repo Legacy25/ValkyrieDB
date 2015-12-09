@@ -25,6 +25,7 @@ namespace valkyrie{
         Schema(string tablename);
         Schema(string tablename, string datafile);
         void addAttribute(string, DataType);
+        void addAttribute(string, DataType, Expression*);
         void materialize();
         bool isMaterialized() const;
 

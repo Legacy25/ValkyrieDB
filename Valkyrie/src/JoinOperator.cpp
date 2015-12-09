@@ -14,6 +14,7 @@ JoinOperator::JoinOperator(std::vector<std::string> expressionList, std::vector<
     ExpressionParser parser;
     joinClause = parser.parse(expressions[0])[0];
     updateExpression(joinClause, lsch->getColumnMap(), rsch->getColumnMap(), lsch->getTableName(), rsch->getTableName());
+    schema = mergeSchemas(lsch, rsch);
 }
 
 void JoinOperator::consume() {
@@ -57,4 +58,15 @@ void JoinOperator::updateExpression(Expression *exp, unordered_map<string, Expre
             std::cout << "not found in any schema " << std::endl;
         }
     }
+}
+
+Schema* JoinOperator::mergeSchemas(Schema *lsch, Schema *rsch) {
+    Schema *res = new Schema("JOIN" + lsch->getTableName() + "_" + rsch->getTableName());
+    std::vector<std::string> attr = lsch->getAttributes();
+    for(int i = 0; i < attr.size(); i++)
+        res->addAttribute(attr[i], lsch->getAttributeType(attr[i]), lsch->getAttrExpression(attr[i]));
+    attr = rsch->getAttributes();
+    for(int i = 0; i < attr.size(); i++)
+        res->addAttribute(attr[i], rsch->getAttributeType(attr[i]), rsch->getAttrExpression(attr[i]));
+    return res;
 }
