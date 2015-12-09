@@ -4,6 +4,7 @@
 
 #include "../include/JoinOperator.h"
 #include "../include/ExpressionParser.h"
+#include "../include/Codegen.h"
 
 using namespace valkyrie;
 
@@ -25,6 +26,7 @@ void JoinOperator::consume() {
                 cout << i->getColName() << endl;
             }
             status = 1;
+            codegen::joinLeftConsume(this);
             break;
         case 1:
             cout << "\nRIGHT\n" << endl;
@@ -32,9 +34,7 @@ void JoinOperator::consume() {
                 cout << i->getColName() << endl;
             }
             status = 2;
-            break;
-        case 2:
-            cout << "\nDONE ======\n" << endl;
+            codegen::joinRightConsume(this);
             break;
         default:
             cout << "Unknown status: " << status << endl;
@@ -45,6 +45,7 @@ void JoinOperator::consume() {
 void JoinOperator::produce() {
     children[0]->produce();
     children[1]->produce();
+    codegen::scanConsume(*schema, parent);
 }
 
 void JoinOperator::updateExpression(Expression *exp, unordered_map<string, Expression *> lm, unordered_map<string, Expression *> rm
@@ -82,4 +83,12 @@ Schema* JoinOperator::mergeSchemas(Schema *lsch, Schema *rsch) {
     for(int i = 0; i < attr.size(); i++)
         res->addAttribute(attr[i], rsch->getAttributeType(attr[i]), rsch->getAttrExpression(attr[i]));
     return res;
+}
+
+vector<ColExpression*> JoinOperator::getLeftJoinAttrs() {
+    return left;
+}
+
+vector<ColExpression*> JoinOperator::getRightJoinAttrs() {
+    return right;
 }

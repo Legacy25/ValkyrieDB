@@ -23,7 +23,7 @@ static Module *module;
 static IRBuilder<> *builder;
 
 /* Declaration of llvm functions */
-static Function *mainFunction;
+static Function *mainFunction, *hashFunction, *joinFunction;
 static Constant *printfFunc;
 
 /* Useful codegen variables */
@@ -72,6 +72,8 @@ void codegen::initialize(string ModuleName) {
     FunctionType *printfType = FunctionType::get(int32Type, printfArgsTypes, true);
     printfFunc = module->getOrInsertFunction("printf", printfType);
 
+    // Declare the hash function
+
     // The main function
     FunctionType *mainFunctionType = FunctionType::get(
             int32Type,
@@ -82,6 +84,32 @@ void codegen::initialize(string ModuleName) {
             mainFunctionType,
             Function::ExternalLinkage,
             "llvmStart",
+            module
+    );
+
+    // The hashing function
+    FunctionType *hashFunctionType = FunctionType::get(
+            Type::getVoidTy(context),
+            ArrayRef<Type *>({int64Type, int64Type, int32Type, int64Type, int32Type}),
+            false
+    );
+    hashFunction = Function::Create(
+            hashFunctionType,
+            Function::ExternalLinkage,
+            "hasher",
+            module
+    );
+
+    // The joining function
+    FunctionType *joinFunctionType = FunctionType::get(
+            Type::getVoidTy(context),
+            ArrayRef<Type *>({int64Type, int64Type, int32Type, int64Type, int32Type}),
+            false
+    );
+    joinFunction = Function::Create(
+            joinFunctionType,
+            Function::ExternalLinkage,
+            "joiner",
             module
     );
 
@@ -116,6 +144,7 @@ ExecutionEngine* codegen::compile() {
             create();
 
     executionEngine->finalizeObject();
+
     compiled = true;
     return executionEngine;
 }
@@ -199,6 +228,84 @@ void codegen::printConsume(int *types) {
     builder->CreateCall(printfFunc, vector<Value*>({newLine}));
 }
 
+void codegen::joinLeftConsume(JoinOperator* op) {
+    vector<ColExpression*> left = op->getLeftJoinAttrs();
+    std::vector<string> cols = gschema->getAttributes();
+
+    LeafValue *tuple = new LeafValue[cols.size()]; // Don't call delete on this
+    LeafValue *keys = new LeafValue[left.size()];
+
+    Type *ptrToPtr = PointerType::get(int64PtrType, 0);
+    tuplePtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)tuple), ptrToPtr);
+    Value *keyPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)keys), ptrToPtr);
+
+    // Copy val and call hashmap on ptr
+    for(uint64_t i=0; i<cols.size(); i++) {
+        Expression* exp = gschema->getAttrExpression(cols[i]);
+
+        Value *indices[1];
+        indices[0] = ConstantInt::get(int32Type, i);
+        ArrayRef<Value *> indicesRef(indices);
+
+        Value *tempTupPtr = builder->CreateGEP(tuplePtr, indicesRef);
+        builder->CreateStore(exp->getValue(), tempTupPtr);
+    }
+
+    for(uint64_t i=0; i<left.size(); i++) {
+        Value *indices[1];
+        indices[0] = ConstantInt::get(int32Type, i);
+        ArrayRef<Value *> indicesRef(indices);
+
+        Value *tempKeyPtr = builder->CreateGEP(keyPtr, indicesRef);
+        builder->CreateStore(left[i]->getValue(), tempKeyPtr);
+    }
+
+    Value *opPtr = ConstantInt::get(int64Type, (int64_t)op);
+    Value *keySize = ConstantInt::get(int32Type, left.size());
+    Value *hashArgs[] = {opPtr, keyPtr, keySize, tuplePtr, ac};
+    ArrayRef<Value*> hargsref(hashArgs);
+    builder->CreateCall(hashFunction, hargsref);
+}
+
+void codegen::joinRightConsume(JoinOperator* op) {
+    vector<ColExpression*> right = op->getRightJoinAttrs();
+    std::vector<string> cols = gschema->getAttributes();
+
+    LeafValue *tuple = new LeafValue[cols.size()]; // Don't call delete on this
+    LeafValue *keys = new LeafValue[right.size()];
+
+    Type *ptrToPtr = PointerType::get(int64PtrType, 0);
+    tuplePtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)tuple), ptrToPtr);
+    Value *keyPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)keys), ptrToPtr);
+
+    // Copy val and call hashmap on ptr
+    for(uint64_t i=0; i<cols.size(); i++) {
+        Expression* exp = gschema->getAttrExpression(cols[i]);
+
+        Value *indices[1];
+        indices[0] = ConstantInt::get(int32Type, i);
+        ArrayRef<Value *> indicesRef(indices);
+
+        Value *tempTupPtr = builder->CreateGEP(tuplePtr, indicesRef);
+        builder->CreateStore(exp->getValue(), tempTupPtr);
+    }
+
+    for(uint64_t i=0; i<right.size(); i++) {
+        Value *indices[1];
+        indices[0] = ConstantInt::get(int32Type, i);
+        ArrayRef<Value *> indicesRef(indices);
+
+        Value *tempKeyPtr = builder->CreateGEP(keyPtr, indicesRef);
+        builder->CreateStore(right[i]->getValue(), tempKeyPtr);
+    }
+
+    Value *opPtr = ConstantInt::get(int64Type, (int64_t)op);
+    Value *keySize = ConstantInt::get(int32Type, right.size());
+    Value *joinArgs[] = {opPtr, keyPtr, keySize, tuplePtr, ac};
+    ArrayRef<Value*> jargsref(joinArgs);
+    builder->CreateCall(joinFunction, jargsref);
+}
+
 IRBuilder<>* codegen::getBuilder() {
     return builder;
 }
@@ -225,4 +332,22 @@ void codegen::setSchema(Schema *schema) {
 
 Schema* codegen::getSchema(){
     return gschema;
+}
+
+extern "C"
+void hasher(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int32_t ac) {
+    JoinOperator *op = (JoinOperator*)opPtr;
+    LeafValue *tup = (LeafValue*)tupPtr;
+    LeafValue *key = (LeafValue*)keyPtr;
+
+    cout << "hasher called" << endl;
+}
+
+extern "C"
+void joiner(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int32_t ac) {
+    JoinOperator *op = (JoinOperator*)opPtr;
+    LeafValue *tup = (LeafValue*)tupPtr;
+    LeafValue *key = (LeafValue*)keyPtr;
+
+    cout << "joiner called" << endl;
 }

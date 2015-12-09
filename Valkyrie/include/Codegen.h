@@ -11,6 +11,7 @@
 #include "Operator.h"
 #include "Schema.h"
 #include "Expression.h"
+#include "JoinOperator.h"
 
 using namespace llvm;
 using namespace std;
@@ -28,6 +29,8 @@ namespace codegen {
     void scanConsume(Schema&, valkyrie::Operator* parent);
     void selectConsume(Expression* expressions, valkyrie::Operator *parent);
     void printConsume(int*);
+    void joinLeftConsume(JoinOperator*);
+    void joinRightConsume(JoinOperator*);
     void setSchema(Schema *schema);
     Schema* getSchema();
 }
