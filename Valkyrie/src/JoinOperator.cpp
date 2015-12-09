@@ -16,9 +16,22 @@ JoinOperator::JoinOperator(std::vector<std::string> expressionList, std::vector<
     updateExpression(joinClause, lsch->getColumnMap(), rsch->getColumnMap(), lsch->getTableName(), rsch->getTableName());
 }
 
-void JoinOperator::consume() { }
+void JoinOperator::consume() {
+    children[0]->consume();
+    cout << "JOIN DEBUG ====\nLEFT\n" << endl;
+    for(auto i : left) {
+        cout << i->getColName() << endl;
+    }
+    cout << "\nRIGHT\n" << endl;
+    for(auto i : right) {
+        cout << i->getColName() << endl;
+    }
+}
 
-void JoinOperator::produce() { }
+void JoinOperator::produce() {
+    children[0]->produce();
+    children[1]->produce();
+}
 
 void JoinOperator::updateExpression(Expression *exp, unordered_map<string, Expression *> lm, unordered_map<string, Expression *> rm
         , string ltable, string rtable) {
@@ -34,10 +47,12 @@ void JoinOperator::updateExpression(Expression *exp, unordered_map<string, Expre
             ColExpression* e = (ColExpression*)lm[col->getColName()];
             col->setType(e->getDataType());
             col->setColPos(e->getColPos());
+            left.push_back(col);
         } else if(rm.find(col->getColName()) != rm.end() && col->getTableName() == rtable){
             ColExpression* e = (ColExpression*)rm[col->getColName()];
             col->setType(e->getDataType());
             col->setColPos(e->getColPos());
+            right.push_back(col);
         } else {
             std::cout << "not found in any schema " << std::endl;
         }
