@@ -32,14 +32,13 @@ void ProjectionOperator::updateSchema(){
     Schema *schema = new Schema(old->getTableName());
     schema->setTuples(old->getTuples());
     unordered_map<string, Expression*> nschema;
-	ExpressionParser parser;
 	for(int i = 0; i < expressions.size(); i++){
 		std::size_t pos = expressions[i].find(" AS ");
         //TODO check the random column name assignment
 		std::string colName = pos == std::string::npos ? "default_" + std::to_string(i) : expressions[i].substr(0, pos);
 		updateExpression(projectionClauses[i], old->getColumnMap());
         nschema.insert(std::make_pair(colName, projectionClauses[i]));
-		schema->addAttribute(colName, parser.evaluateType(projectionClauses[i]));
+		schema->addAttribute(colName, projectionClauses[i]->getDataType());
 	}
 	schema->setColumnMap(nschema);
     codegen::setSchema(schema);
@@ -74,6 +73,7 @@ void ProjectionOperator::updateExpression(Expression *newExp, unordered_map<std:
 			ColExpression* col = (ColExpression*)m[((ColExpression*)newExp)->getColName()];
 			((ColExpression*)newExp)->setColPos(col->getColPos());
 			((ColExpression*)newExp)->setType(col->getDataType());
+			((ColExpression*)newExp)->setTableName(col->getTableName());
 		}
 	}
 }

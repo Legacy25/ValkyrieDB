@@ -148,27 +148,3 @@ long ExpressionParser::extractLong(std::string s){
 double ExpressionParser::extractDouble(std::string s){
 	return std::atof(s.c_str());
 }
-
-DataType ExpressionParser::evaluateType(Expression *exp) {
-	ExprType t = exp->getType();
-	if(t == STRINGVALUEEXPRESSION)
-		return STRING;
-	if(t == DOUBLEVALUEEXPRESSION)
-		return DOUBLE;
-	if(t == LONGVALUEEXPRESSION)
-		return LONG;
-	if(t == DATEVALUEEXPRESSION)
-		return DATE;
-	if(t == ADDITIONEXPRESSION || t == SUBTRACTIONEXPRESSION || t == MULTIPLICATIONEXPRESSION || t == DIVISIONEXPRESSION){
-		BinaryExpression* bexp = (BinaryExpression*)exp;
-		DataType t1 = evaluateType(bexp->getLeftExpression());
-		DataType t2 = evaluateType(bexp->getRightExpression());
-		if(t1 == DOUBLE || t2 == DOUBLE)
-			return DOUBLE;
-		return LONG;
-	}
-	if(t == COLEXPRESSION)
-		return ((ColExpression*)exp)->getDataType();
-	//Boolean
-	return LONG;
-}

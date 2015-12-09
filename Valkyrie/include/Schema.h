@@ -29,6 +29,7 @@ namespace valkyrie{
         bool isMaterialized() const;
 
         // Getters, Setters
+        void setTableName(string tablename);
         uint64_t getTuplePtr() const;
         void setTuples(vector<LeafValue*> tuples);
         vector<LeafValue *> getTuples();

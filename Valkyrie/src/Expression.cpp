@@ -311,16 +311,16 @@ Value* DateValueExpression::getValue() {
 }
 
 ColExpression::ColExpression(std::string name){
-    colname = name;
+    setColName(name);
 }
 
 ColExpression::ColExpression(string name, int colPos) {
-    colname = name;
+    setColName(name);
     index = colPos;
 }
 
 ColExpression::ColExpression(string name, int colPos, DataType type) {
-    this->colname = name;
+    setColName(name);
     this->index = colPos;
     this->type = type;
 }
@@ -340,12 +340,32 @@ DataType ColExpression::getDataType(){
     return this->type;
 }
 
+string ColExpression::getQualifiedName() {
+    return tablename + "." + colname;
+}
+
+void ColExpression::setTableName(string tablename) {
+    this->tablename = tablename;
+}
+
+string ColExpression::getTableName() {
+    return tablename;
+}
+
 string ColExpression::getColName() {
     return this->colname;
 }
 
 void ColExpression::setColName(string name) {
-    this->colname = name;
+    std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+    size_t pos = name.find(".");
+    if(pos != std::string::npos){
+        colname = name.substr(pos+1);
+        tablename = name.substr(0, pos);
+    } else{
+        tablename = "";
+        colname = name;
+    }
 }
 
 Value* ColExpression::getValue() {
@@ -364,7 +384,29 @@ Value* ColExpression::getValue() {
         case STRING:
         case DATE:
             return data;
-            break;
     }
-//    return NULL;
+}
+
+DataType Expression::getDataType() {
+    ExprType t = this->getType();
+    if(t == STRINGVALUEEXPRESSION)
+        return STRING;
+    if(t == DOUBLEVALUEEXPRESSION)
+        return DOUBLE;
+    if(t == LONGVALUEEXPRESSION)
+        return LONG;
+    if(t == DATEVALUEEXPRESSION)
+        return DATE;
+    if(t == ADDITIONEXPRESSION || t == SUBTRACTIONEXPRESSION || t == MULTIPLICATIONEXPRESSION || t == DIVISIONEXPRESSION){
+        BinaryExpression* bexp = (BinaryExpression*)this;
+        DataType t1 = bexp->getLeftExpression()->getDataType();
+        DataType t2 = bexp->getRightExpression()->getDataType();
+        if(t1 == DOUBLE || t2 == DOUBLE)
+            return DOUBLE;
+        return LONG;
+    }
+    if(t == COLEXPRESSION)
+        return getDataType();
+    //Boolean
+    return LONG;
 }

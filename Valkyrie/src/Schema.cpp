@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstring>
+#include <algorithm>
 
 #include "../include/Schema.h"
 #include "../include/Operator.h"
@@ -41,10 +42,12 @@ string Schema::attrsVecsToCommaSepString(const vector<string>& attr, const vecto
     return line;
 }
 
-Schema::Schema(string tablename) : tablename(tablename) {}
+Schema::Schema(string tablename) {
+    setTableName(tablename);
+}
 
-Schema::Schema(string tablename, string datafile)
-: tablename(tablename), datafile(datafile) {
+Schema::Schema(string tablename, string datafile) : datafile(datafile) {
+    setTableName(tablename);
     materialized = false;
 }
 
@@ -136,6 +139,12 @@ std::string Schema::getDataFile() const{
 vector<string> Schema::getAttributes() const{
     return attributes;
 }
+
+void Schema::setTableName(string tablename) {
+    std::transform(tablename.begin(), tablename.end(), tablename.begin(), ::tolower);
+    this->tablename = tablename;
+}
+
 size_t Schema::getAttributePos(string colName) const {
     for(size_t i =0; i < attributes.size(); i++){
         if(attributes.at(i) == colName){

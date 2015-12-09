@@ -7,6 +7,7 @@
 #include "ScanOperator.h"
 #include "SelectOperator.h"
 #include "ProjectionOperator.h"
+#include "JoinOperator.h"
 #include "rapidjson/document.h"
 
 namespace valkyrie{

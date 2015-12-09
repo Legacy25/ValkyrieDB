@@ -41,6 +41,7 @@ void SelectOperator::updateExpression(Expression *newExp, unordered_map<std::str
 			ColExpression* col = (ColExpression*)m[((ColExpression*)newExp)->getColName()];
 			((ColExpression*)newExp)->setColPos(col->getColPos());
 			((ColExpression*)newExp)->setType(col->getDataType());
+			((ColExpression*)newExp)->setTableName(col->getTableName());
 		}
 	}
 }

@@ -15,4 +15,5 @@ WHERE
 GROUP BY lineitem.orderkey, orders.orderdate, orders.shippriority 
 ORDER BY revenue desc, orders.orderdate;*/
 
-select suppkey from supplier where suppkey > 4;
+select name, nationkey from nation where nationkey > 3;
+--select nation.name, region.name from nation, region where nation.regionkey = region.regionkey;

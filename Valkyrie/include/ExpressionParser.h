@@ -25,7 +25,6 @@ namespace valkyrie{
 	public:
 		ExpressionParser();
 		std::vector<valkyrie::Expression*> parse(std::string exp);
-		DataType evaluateType(Expression* exp);
 	};
 }
 

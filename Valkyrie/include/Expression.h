@@ -44,6 +44,7 @@ namespace valkyrie{
     public:
         virtual Value* getValue() = 0;
         virtual ExprType getType(){ return ExprType::EXPRESSION; }
+        virtual DataType getDataType();
         virtual string toString() = 0;
         /*string expressionPlan(){
             std::string res = "";
@@ -255,9 +256,11 @@ namespace valkyrie{
     // This represents a column
     class ColExpression: public Expression {
     private:
+        string tablename;
         string colname;
         int index = -1;
         DataType type;
+
     public:
         ColExpression(string name);
         ColExpression(string name, int colPos);
@@ -266,6 +269,9 @@ namespace valkyrie{
         int getColPos();
         void setType(DataType type);
         DataType getDataType();
+        string getQualifiedName();
+        void setTableName(string tablename);
+        string getTableName();
         string getColName();
         void setColName(string);
         Value* getValue();

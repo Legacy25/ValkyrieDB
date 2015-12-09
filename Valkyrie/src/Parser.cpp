@@ -35,6 +35,8 @@ Operator* Parser::createTree(const rapidjson::Value& node){
 		op = new ScanOperator(expressions, children);
 	} else if(type == "PRINT"){
 		op = new PrintOperator(expressions, children);
+	} else if(type == "JOIN"){
+		op = new JoinOperator(expressions, children);
 	}
 	return op;
 }
