@@ -236,7 +236,7 @@ void codegen::joinLeftConsume(JoinOperator* op) {
     LeafValue *keys = new LeafValue[left.size()];
 
     Type *ptrToPtr = PointerType::get(int64PtrType, 0);
-    tuplePtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)tuple), ptrToPtr);
+    Value* tempPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)tuple), ptrToPtr);
     Value *keyPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)keys), ptrToPtr);
 
     // Copy val and call hashmap on ptr
@@ -247,7 +247,7 @@ void codegen::joinLeftConsume(JoinOperator* op) {
         indices[0] = ConstantInt::get(int32Type, i);
         ArrayRef<Value *> indicesRef(indices);
 
-        Value *tempTupPtr = builder->CreateGEP(tuplePtr, indicesRef);
+        Value *tempTupPtr = builder->CreateGEP(tempPtr, indicesRef);
         builder->CreateStore(exp->getValue(), tempTupPtr);
     }
 
@@ -262,7 +262,7 @@ void codegen::joinLeftConsume(JoinOperator* op) {
 
     Value *opPtr = ConstantInt::get(int64Type, (int64_t)op);
     Value *keySize = ConstantInt::get(int32Type, left.size());
-    Value *hashArgs[] = {opPtr, keyPtr, keySize, tuplePtr, ac};
+    Value *hashArgs[] = {opPtr, keyPtr, keySize, tempPtr, ac};
     ArrayRef<Value*> hargsref(hashArgs);
     builder->CreateCall(hashFunction, hargsref);
 }
@@ -275,7 +275,7 @@ void codegen::joinRightConsume(JoinOperator* op) {
     LeafValue *keys = new LeafValue[right.size()];
 
     Type *ptrToPtr = PointerType::get(int64PtrType, 0);
-    tuplePtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)tuple), ptrToPtr);
+    Value* tempPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)tuple), ptrToPtr);
     Value *keyPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)keys), ptrToPtr);
 
     // Copy val and call hashmap on ptr
@@ -286,7 +286,7 @@ void codegen::joinRightConsume(JoinOperator* op) {
         indices[0] = ConstantInt::get(int32Type, i);
         ArrayRef<Value *> indicesRef(indices);
 
-        Value *tempTupPtr = builder->CreateGEP(tuplePtr, indicesRef);
+        Value *tempTupPtr = builder->CreateGEP(tempPtr, indicesRef);
         builder->CreateStore(exp->getValue(), tempTupPtr);
     }
 
@@ -301,7 +301,7 @@ void codegen::joinRightConsume(JoinOperator* op) {
 
     Value *opPtr = ConstantInt::get(int64Type, (int64_t)op);
     Value *keySize = ConstantInt::get(int32Type, right.size());
-    Value *joinArgs[] = {opPtr, keyPtr, keySize, tuplePtr, ac};
+    Value *joinArgs[] = {opPtr, keyPtr, keySize, tempPtr, ac};
     ArrayRef<Value*> jargsref(joinArgs);
     builder->CreateCall(joinFunction, jargsref);
 }
@@ -340,7 +340,15 @@ void hasher(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
     LeafValue *tup = (LeafValue*)tupPtr;
     LeafValue *key = (LeafValue*)keyPtr;
 
-    cout << "hasher called" << endl;
+    cout << "Hasher called" << endl;
+    for(int i=0; i<ac; i++) {
+        cout << tup[i] << ", ";
+    }
+    cout << " || KEYS: ";
+    for(int i=0; i<keySize; i++) {
+        cout << key[i] << ", ";
+    }
+    cout << endl;
 }
 
 extern "C"
@@ -349,5 +357,13 @@ void joiner(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
     LeafValue *tup = (LeafValue*)tupPtr;
     LeafValue *key = (LeafValue*)keyPtr;
 
-    cout << "joiner called" << endl;
+    cout << "Joiner called" << endl;
+    for(int i=0; i<ac; i++) {
+        cout << tup[i] << ", ";
+    }
+    cout << " || KEYS: ";
+    for(int i=0; i<keySize; i++) {
+        cout << key[i] << ", ";
+    }
+    cout << endl;
 }
