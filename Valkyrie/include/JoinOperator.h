@@ -20,7 +20,7 @@ namespace valkyrie {
                 , string ltable, string rtable);
         Schema* mergeSchemas(Schema* lsch, Schema* rsch);
     public:
-        unordered_map<string, LeafValue*> hashtable;
+        unordered_map<string, vector<LeafValue>> hashtable;
         JoinOperator(std::vector<std::string> expressions, std::vector<Operator*> children);
         void produce();
         void consume();

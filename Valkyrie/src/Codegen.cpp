@@ -340,15 +340,22 @@ void hasher(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
     LeafValue *tup = (LeafValue*)tupPtr;
     LeafValue *key = (LeafValue*)keyPtr;
 
+    vector<LeafValue> *newt = new vector<LeafValue>();
+
     cout << "Hasher called" << endl;
     for(int i=0; i<ac; i++) {
         cout << tup[i] << ", ";
+        newt->push_back(tup[i]);
     }
     cout << " || KEYS: ";
+    string keyStr = "";
     for(int i=0; i<keySize; i++) {
         cout << key[i] << ", ";
+        keyStr += to_string(key[i])+".";
     }
     cout << endl;
+
+    op->hashtable.insert({keyStr, newt});
 }
 
 extern "C"
@@ -362,8 +369,12 @@ void joiner(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
         cout << tup[i] << ", ";
     }
     cout << " || KEYS: ";
+    string keyStr = "";
     for(int i=0; i<keySize; i++) {
         cout << key[i] << ", ";
+        keyStr += to_string(key[i])+".";
     }
     cout << endl;
+
+    // TODO Iterate over hashtable and join, then push into schema.tuples
 }
