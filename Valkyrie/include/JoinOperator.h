@@ -14,6 +14,7 @@ namespace valkyrie {
         Expression* joinClause;
         void updateExpression(Expression* exp, unordered_map<string, Expression*> lm, unordered_map<string, Expression*>rm
                 , string ltable, string rtable);
+        Schema* mergeSchemas(Schema* lsch, Schema* rsch);
     public:
         JoinOperator(std::vector<std::string> expressions, std::vector<Operator*> children);
         void produce();

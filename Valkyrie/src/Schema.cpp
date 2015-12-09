@@ -57,6 +57,12 @@ void Schema::addAttribute(string attr, DataType t) {
     colMap.insert(make_pair(attr, new ColExpression(attr, attributes.size()-1, t)));
 }
 
+void Schema::addAttribute(string attr, DataType t, Expression *expression) {
+    attributes.push_back(attr);
+    types.push_back(t);
+    colMap.insert(make_pair(attr, expression));
+}
+
 void Schema::materialize() {
     if(materialized)
         return;
@@ -151,7 +157,7 @@ size_t Schema::getAttributePos(string colName) const {
             return  i;
         }
     }
-    std::cerr << "colName NOT Found"<<std::endl;
+    std::cerr << "colName " << colName << " NOT Found" <<std::endl;
     exit(-1);
 }
 string Schema::getTableName() const{
@@ -163,7 +169,7 @@ DataType Schema::getAttributeType(string colName) const {
             return  types.at(i);
         }
     }
-    std::cerr << "colName NOT Found"<<std::endl;
+    std::cerr << "colName " << colName << " NOT Found" <<std::endl;
     exit(-1);
 }
 
