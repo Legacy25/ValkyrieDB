@@ -33,6 +33,7 @@ namespace valkyrie{
         // Getters, Setters
         void setTableName(string tablename);
         uint64_t getTuplePtr() const;
+        uint64_t getTuplePtr1() const;
         void setTuples(vector<LeafValue*> tuples);
         vector<LeafValue *> getTuples();
         size_t getTupleCount() const;

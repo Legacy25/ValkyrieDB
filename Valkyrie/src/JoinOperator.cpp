@@ -21,18 +21,18 @@ JoinOperator::JoinOperator(std::vector<std::string> expressionList, std::vector<
 void JoinOperator::consume() {
     switch(status) {
         case 0:
-            cout << "JOIN DEBUG ====\nLEFT\n" << endl;
-            for(auto i : left) {
-                cout << i->getColName() << endl;
-            }
+//            cout << "JOIN DEBUG ====\nLEFT\n" << endl;
+//            for(auto i : left) {
+//                cout << i->getColName() << endl;
+//            }
             status = 1;
             codegen::joinLeftConsume(this);
             break;
         case 1:
-            cout << "\nRIGHT\n" << endl;
-            for(auto i : right) {
-                cout << i->getColName() << endl;
-            }
+//            cout << "\nRIGHT\n" << endl;
+//            for(auto i : right) {
+//                cout << i->getColName() << endl;
+//            }
             status = 2;
             codegen::joinRightConsume(this);
             break;
@@ -45,8 +45,8 @@ void JoinOperator::consume() {
 void JoinOperator::produce() {
     children[0]->produce();
     children[1]->produce();
-    LeafValue *dummy = new LeafValue[schema->getAttributes().size()];
-    schema->addTuple(dummy);
+//    LeafValue *dummy = new LeafValue[schema->getAttributes().size()];
+//    schema->addTuple(dummy);
     codegen::joinConsume(*schema, parent);
 }
 
