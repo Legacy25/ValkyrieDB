@@ -26,6 +26,7 @@ namespace valkyrie{
         Schema(string tablename, string datafile);
         void addAttribute(string, DataType);
         void addAttribute(string, DataType, Expression*);
+        void addTuple(LeafValue *);
         void materialize();
         bool isMaterialized() const;
 
@@ -45,12 +46,15 @@ namespace valkyrie{
         Expression* getAttrExpression(string colName);
         unordered_map<string, valkyrie::Expression*> getColumnMap();
         void setColumnMap(unordered_map<string, valkyrie::Expression*> m);
+        std::string attrsVecsToCommaSepString(const vector<string>& attr, const vector<DataType>& types) const;
 
+
+        friend ostream& operator<<(ostream &stream, const valkyrie::Schema &schema);
 
         // Utilities
-        friend ostream& operator<<(ostream &stream, const Schema &schema);
-        std::string attrsVecsToCommaSepString(const vector<string>& attr, const vector<DataType>& types) const;
     };
 }
+
+
 
 #endif //CDB_SCHEMA_H

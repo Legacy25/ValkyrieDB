@@ -191,6 +191,8 @@ void codegen::scanConsume(Schema& schema, valkyrie::Operator *parent) {
     builder->SetInsertPoint(afterLoop);
 }
 
+
+
 void codegen::selectConsume(Expression *clause, valkyrie::Operator *parent){
     Value* condV = clause->getValue();
     BasicBlock *cond_true = BasicBlock::Create(context, "If"+to_string(nameCtr++), mainFunction);
@@ -353,9 +355,20 @@ void hasher(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
         cout << key[i] << ", ";
         keyStr += to_string(key[i])+".";
     }
-    cout << endl;
-
-    op->hashtable.insert({keyStr, newt});
+    cout << "HASHTABLE\n\n\n" << endl;
+    cout << "keystr " << keyStr << "newt " << newt << endl;
+    op->hashtable[keyStr].push_back(*newt);
+    
+    /*for(auto it = op->hashtable.begin(); it != op->hashtable.end(); it++){
+        cout << it->first << "=>" << it->second.size() << endl;
+        for(int i = 0; i < it->second.size(); i++){
+            vector<LeafValue> iv = it->second[i];
+            for(int j=0; j < iv.size(); j++){
+                cout << iv[j] << "\t";
+            }
+            cout << endl;
+        }
+    }*/
 }
 
 extern "C"
@@ -377,4 +390,26 @@ void joiner(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
     cout << endl;
 
     // TODO Iterate over hashtable and join, then push into schema.tuples
+    for(auto i : op->hashtable[keyStr]) {
+        vector<LeafValue> *joinedTuple = new vector<LeafValue>();
+        joinedTuple->insert(joinedTuple->begin(), i.begin(), i.end());
+        for(int j=0; j<ac; j++) {
+            joinedTuple->push_back(tup[j]);
+        }
+        for(int i = 0; i < joinedTuple->size(); i++){
+            cout << (*joinedTuple)[i] << " ";
+        }
+        cout << endl;
+        op->getSchema()->addTuple(&((*joinedTuple)[0]));
+    }
+
+    /*cout << "\n\n\n=======================" << endl;
+    for(auto i: op->getSchema()->getTuples()) {
+        for(int j=0; j<op->getSchema()->getAttributes().size(); j++) {
+            cout << *(i+j) << "|";
+        }
+        cout << endl;
+    }
+    cout << "\n\n\n=======================" << endl;*/
+
 }

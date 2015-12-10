@@ -190,3 +190,7 @@ Expression *Schema::getAttrExpression(string colName) {
         return NULL;
     return colMap[colName];
 }
+
+void Schema::addTuple(LeafValue *lv) {
+    tuples.push_back(lv);
+}

@@ -45,6 +45,8 @@ void JoinOperator::consume() {
 void JoinOperator::produce() {
     children[0]->produce();
     children[1]->produce();
+    LeafValue *dummy = new LeafValue[schema->getAttributes().size()];
+    schema->addTuple(dummy);
     codegen::scanConsume(*schema, parent);
 }
 
