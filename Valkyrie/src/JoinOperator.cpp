@@ -69,7 +69,8 @@ void JoinOperator::updateExpression(Expression *exp, unordered_map<string, Expre
             ColExpression* e = (ColExpression*)rm[col->getColName()];
             col->setType(e->getDataType());
             col->setColPos(e->getColPos()+(int)lm.size());
-            right.push_back(col);
+            ColExpression *rcol = new ColExpression(col->getQualifiedName(), col->getColPos()-(int)lm.size(), col->getDataType());
+            right.push_back(rcol);
         } else {
             std::cout << "not found in any schema " << std::endl;
         }
