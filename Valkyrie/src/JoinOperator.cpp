@@ -47,7 +47,7 @@ void JoinOperator::produce() {
     children[1]->produce();
     LeafValue *dummy = new LeafValue[schema->getAttributes().size()];
     schema->addTuple(dummy);
-    codegen::scanConsume(*schema, parent);
+    codegen::joinConsume(*schema, parent);
 }
 
 void JoinOperator::updateExpression(Expression *exp, unordered_map<string, Expression *> lm, unordered_map<string, Expression *> rm
@@ -68,7 +68,7 @@ void JoinOperator::updateExpression(Expression *exp, unordered_map<string, Expre
         } else if(rm.find(col->getColName()) != rm.end() && col->getTableName() == rtable){
             ColExpression* e = (ColExpression*)rm[col->getColName()];
             col->setType(e->getDataType());
-            col->setColPos(e->getColPos());
+            col->setColPos(e->getColPos()+(int)lm.size());
             right.push_back(col);
         } else {
             std::cout << "not found in any schema " << std::endl;

@@ -23,7 +23,7 @@ static Module *module;
 static IRBuilder<> *builder;
 
 /* Declaration of llvm functions */
-static Function *mainFunction, *hashFunction, *joinFunction;
+static Function *mainFunction, *hashFunction, *joinFunction, *sizeFunction;
 static Constant *printfFunc;
 
 /* Useful codegen variables */
@@ -113,6 +113,19 @@ void codegen::initialize(string ModuleName) {
             module
     );
 
+    // The size function
+    FunctionType *sizeFunctionType = FunctionType::get(
+            Type::getInt64Ty(context),
+            ArrayRef<Type *>({int64Type}),
+            false
+    );
+    sizeFunction = Function::Create(
+            sizeFunctionType,
+            Function::ExternalLinkage,
+            "sizer",
+            module
+    );
+
     BasicBlock *entry = BasicBlock::Create(context, "entry", mainFunction);
     builder->SetInsertPoint(entry);
 
@@ -187,6 +200,58 @@ void codegen::scanConsume(Schema& schema, valkyrie::Operator *parent) {
     BasicBlock *afterLoop = BasicBlock::Create(context, "afterloop"+to_string(nameCtr++), mainFunction);
     Value *cmp = builder->CreateICmpSLT(inc, tc);
     builder->CreateCondBr(cmp, loopBody, afterLoop);
+
+    builder->SetInsertPoint(afterLoop);
+}
+
+
+
+void codegen::joinConsume(Schema& schema, valkyrie::Operator *parent) {
+    gschema = &schema;
+    Type *ptrToPtr = PointerType::get(int64PtrType, 0);
+    Value *ptr = builder->CreateIntToPtr(ConstantInt::get(int64Type, schema.getTuplePtr()), ptrToPtr);
+    ac = ConstantInt::get(int32Type, schema.getAttributes().size());
+    Value* args[1];
+    args[0] = ConstantInt::get(int64Type, (int64_t)gschema);
+    ArrayRef<Value *> argsRef(args);
+    tc = builder->CreateCall(sizeFunction, argsRef);
+//    tc = ConstantInt::get(int64Type, 25);
+
+    Value *loopVar =
+            builder->CreateAlloca(
+                    int64Type,
+                    ConstantInt::get(int64Type, 1),
+                    "loopVar" + to_string(nameCtr++)
+            );
+    builder->CreateStore(ConstantInt::get(int64Type, 0), loopVar);
+
+    BasicBlock *condCheck = BasicBlock::Create(context, "condCheck" + to_string(nameCtr++), mainFunction);
+    BasicBlock *loopBody = BasicBlock::Create(context, "loopBody" + to_string(nameCtr++), mainFunction);
+    BasicBlock *afterLoop = BasicBlock::Create(context, "afterloop"+to_string(nameCtr++), mainFunction);
+
+    builder->CreateBr(condCheck);
+    builder->SetInsertPoint(condCheck);
+
+    Value *cmp = builder->CreateICmpSLT(builder->CreateLoad(loopVar), tc);
+    builder->CreateCondBr(cmp, loopBody, afterLoop);
+
+    builder->SetInsertPoint(loopBody);
+
+    Value *i = builder->CreateLoad(loopVar);
+
+    Value *indices[1];
+    indices[0] = i;
+    ArrayRef<Value *> indicesRef(indices);
+
+    tuplePtr = builder->CreateLoad(builder->CreateInBoundsGEP(ptr, indicesRef));
+
+    if (parent != NULL) {
+        parent->consume();
+    }
+
+    Value *inc = builder->CreateAdd(i, ConstantInt::get(int64Type, 1));
+    builder->CreateStore(inc, loopVar);
+    builder->CreateBr(condCheck);
 
     builder->SetInsertPoint(afterLoop);
 }
@@ -344,21 +409,21 @@ void hasher(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
 
     vector<LeafValue> *newt = new vector<LeafValue>();
 
-    cout << "Hasher called" << endl;
+//    cout << "Hasher called" << endl;
     for(int i=0; i<ac; i++) {
-        cout << tup[i] << ", ";
+//        cout << tup[i] << ", ";
         newt->push_back(tup[i]);
     }
-    cout << " || KEYS: ";
+//    cout << " || KEYS: ";
     string keyStr = "";
     for(int i=0; i<keySize; i++) {
-        cout << key[i] << ", ";
+//        cout << key[i] << ", ";
         keyStr += to_string(key[i])+".";
     }
-    cout << "HASHTABLE\n\n\n" << endl;
-    cout << "keystr " << keyStr << "newt " << newt << endl;
+//    cout << "HASHTABLE\n\n\n" << endl;
+//    cout << "keystr " << keyStr << "newt " << newt << endl;
     op->hashtable[keyStr].push_back(*newt);
-    
+
     /*for(auto it = op->hashtable.begin(); it != op->hashtable.end(); it++){
         cout << it->first << "=>" << it->second.size() << endl;
         for(int i = 0; i < it->second.size(); i++){
@@ -377,17 +442,17 @@ void joiner(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
     LeafValue *tup = (LeafValue*)tupPtr;
     LeafValue *key = (LeafValue*)keyPtr;
 
-    cout << "Joiner called" << endl;
-    for(int i=0; i<ac; i++) {
-        cout << tup[i] << ", ";
-    }
-    cout << " || KEYS: ";
+//    cout << "Joiner called" << endl;
+//    for(int i=0; i<ac; i++) {
+//        cout << tup[i] << ", ";
+//    }
+//    cout << " || KEYS: ";
     string keyStr = "";
     for(int i=0; i<keySize; i++) {
-        cout << key[i] << ", ";
+//        cout << key[i] << ", ";
         keyStr += to_string(key[i])+".";
     }
-    cout << endl;
+//    cout << endl;
 
     // TODO Iterate over hashtable and join, then push into schema.tuples
     for(auto i : op->hashtable[keyStr]) {
@@ -396,10 +461,10 @@ void joiner(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
         for(int j=0; j<ac; j++) {
             joinedTuple->push_back(tup[j]);
         }
-        for(int i = 0; i < joinedTuple->size(); i++){
-            cout << (*joinedTuple)[i] << " ";
-        }
-        cout << endl;
+//        for(int i = 0; i < joinedTuple->size(); i++){
+//            cout << (*joinedTuple)[i] << " ";
+//        }
+//        cout << endl;
         op->getSchema()->addTuple(&((*joinedTuple)[0]));
     }
 
@@ -412,4 +477,11 @@ void joiner(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
     }
     cout << "\n\n\n=======================" << endl;*/
 
+}
+
+extern "C"
+uint64_t sizer(int64_t schemaaddr) {
+    Schema *schema = (Schema*)schemaaddr;
+    cout << "\n\n\n\n=============\n\n\nYAAAY\n\n\n======" << endl;
+    return schema->getTuples().size();
 }
