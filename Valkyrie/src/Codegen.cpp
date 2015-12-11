@@ -302,9 +302,8 @@ void codegen::joinLeftConsume(JoinOperator* op) {
     LeafValue *tuple = new LeafValue[cols.size()]; // Don't call delete on this
     LeafValue *keys = new LeafValue[left.size()];
 
-    Type *ptrToPtr = PointerType::get(int64PtrType, 0);
-    Value* tempPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)tuple), ptrToPtr);
-    Value *keyPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)keys), ptrToPtr);
+    Value* tempPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)tuple), int64PtrType);
+    Value *keyPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)keys), int64PtrType);
 
     // Copy val and call hashmap on ptr
     for(uint64_t i=0; i<cols.size(); i++) {
@@ -341,9 +340,8 @@ void codegen::joinRightConsume(JoinOperator* op) {
     LeafValue *tuple = new LeafValue[cols.size()]; // Don't call delete on this
     LeafValue *keys = new LeafValue[right.size()];
 
-    Type *ptrToPtr = PointerType::get(int64PtrType, 0);
-    Value* tempPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)tuple), ptrToPtr);
-    Value *keyPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)keys), ptrToPtr);
+    Value* tempPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)tuple), int64PtrType);
+    Value *keyPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)keys), int64PtrType);
 
     // Copy val and call hashmap on ptr
     for(uint64_t i=0; i<cols.size(); i++) {
@@ -356,7 +354,6 @@ void codegen::joinRightConsume(JoinOperator* op) {
         Value *tempTupPtr = builder->CreateGEP(tempPtr, indicesRef);
         builder->CreateStore(exp->getValue(), tempTupPtr);
     }
-
     for(uint64_t i=0; i<right.size(); i++) {
         Value *indices[1];
         indices[0] = ConstantInt::get(int32Type, i);
@@ -409,22 +406,22 @@ void hasher(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
 
     vector<LeafValue> *newt = new vector<LeafValue>();
 
-//    cout << "Hasher called" << endl;
+    cout << "Hasher called" << endl;
     for(int i=0; i<ac; i++) {
-//        cout << tup[i] << ", ";
+        cout << tup[i] << ", ";
         newt->push_back(tup[i]);
     }
-//    cout << " || KEYS: ";
+    cout << " || KEYS: ";
     string keyStr = "";
     for(int i=0; i<keySize; i++) {
-//        cout << key[i] << ", ";
+        cout << key[i] << ", ";
         keyStr += to_string(key[i])+".";
     }
-//    cout << "HASHTABLE\n\n\n" << endl;
-//    cout << "keystr " << keyStr << "newt " << newt << endl;
+    cout << "HASHTABLE\n\n\n" << endl;
+    cout << "keystr " << keyStr << "newt " << newt << endl;
     op->hashtable[keyStr].push_back(*newt);
 
-    /*for(auto it = op->hashtable.begin(); it != op->hashtable.end(); it++){
+    for(auto it = op->hashtable.begin(); it != op->hashtable.end(); it++){
         cout << it->first << "=>" << it->second.size() << endl;
         for(int i = 0; i < it->second.size(); i++){
             vector<LeafValue> iv = it->second[i];
@@ -433,7 +430,7 @@ void hasher(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
             }
             cout << endl;
         }
-    }*/
+    }
 }
 
 extern "C"
@@ -442,17 +439,17 @@ void joiner(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
     LeafValue *tup = (LeafValue*)tupPtr;
     LeafValue *key = (LeafValue*)keyPtr;
 
-//    cout << "Joiner called" << endl;
-//    for(int i=0; i<ac; i++) {
-//        cout << tup[i] << ", ";
-//    }
-//    cout << " || KEYS: ";
+    cout << "Joiner called" << endl;
+    for(int i=0; i<ac; i++) {
+        cout << tup[i] << ", ";
+    }
+    cout << " || KEYS: ";
     string keyStr = "";
     for(int i=0; i<keySize; i++) {
-//        cout << key[i] << ", ";
+        cout << key[i] << ", ";
         keyStr += to_string(key[i])+".";
     }
-//    cout << endl;
+    cout << endl;
 
     // TODO Iterate over hashtable and join, then push into schema.tuples
     for(auto i : op->hashtable[keyStr]) {
@@ -461,27 +458,29 @@ void joiner(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
         for(int j=0; j<ac; j++) {
             joinedTuple->push_back(tup[j]);
         }
-//        for(int i = 0; i < joinedTuple->size(); i++){
-//            cout << (*joinedTuple)[i] << " ";
-//        }
-//        cout << endl;
+        for(int k = 0; k < joinedTuple->size(); k++){
+            cout << (*joinedTuple)[k] << " ";
+        }
+        cout << endl;
         op->getSchema()->addTuple(&((*joinedTuple)[0]));
     }
 
-    /*cout << "\n\n\n=======================" << endl;
+    cout << "\n\n\n=======================" << endl;
     for(auto i: op->getSchema()->getTuples()) {
         for(int j=0; j<op->getSchema()->getAttributes().size(); j++) {
             cout << *(i+j) << "|";
         }
         cout << endl;
     }
-    cout << "\n\n\n=======================" << endl;*/
+    cout << "\n\n\n=======================" << endl;
 
 }
 
 extern "C"
 uint64_t sizer(int64_t schemaaddr) {
     Schema *schema = (Schema*)schemaaddr;
-    cout << "\n\n\n\n=============\n\n\nYAAAY\n\n\n======" << endl;
-    return schema->getTuples().size();
+    int t = schema->getTuples().size();
+    cout << "\n\n\n\n=============\n\n\nYAAAY\n\n\n======" << t << endl;
+    cout << schema->getTableName() << endl;
+    return t;
 }

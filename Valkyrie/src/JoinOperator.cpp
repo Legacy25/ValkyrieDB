@@ -103,15 +103,16 @@ void JoinOperator::updateExpression(Expression *exp, unordered_map<string, Expre
             ColExpression* e = (ColExpression*)rm[col->getQualifiedName()];
             col->setType(e->getDataType());
             col->setColPos(e->getColPos() + (int)lm.size());
-            right.push_back(col);
+            ColExpression *rcol = new ColExpression(col->getQualifiedName(), col->getColPos()-(int)lm.size(), col->getDataType());
+            right.push_back(rcol);
         } else {
-            std::cout << "column : " << col->getColName() << " not found in any schema " << std::endl;
+            std::cout << "column : " << col->getQualifiedName() << " not found in any schema " << std::endl;
         }
     }
 }
 
 Schema* JoinOperator::mergeSchemas(Schema *lsch, Schema *rsch) {
-    Schema *res = new Schema("JOIN" + lsch->getTableName() + "_" + rsch->getTableName());
+    Schema *res = new Schema("JOIN_" + lsch->getTableName() + "_" + rsch->getTableName());
     std::vector<std::string> attr = lsch->getAttributes();
     for(int i = 0; i < attr.size(); i++)
         res->addAttribute(attr[i], lsch->getAttributeType(attr[i]), lsch->getAttrExpression(attr[i]));

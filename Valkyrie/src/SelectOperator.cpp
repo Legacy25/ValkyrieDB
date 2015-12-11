@@ -21,7 +21,8 @@ void SelectOperator::updateExpression(Expression *newExp, unordered_map<std::str
         updateExpression(b->getLeftExpression(), m, tableName);
         updateExpression(b->getRightExpression(), m, tableName);
     } else if (t == ExprType::COLEXPRESSION) {
-        ((ColExpression*)newExp)->setTableName(tableName);
+        if(((ColExpression*)newExp)->getTableName() == "")
+            ((ColExpression*)newExp)->setTableName(tableName);
         ColExpression *col = (ColExpression *) m[((ColExpression *) newExp)->getQualifiedName()];
         ((ColExpression *) newExp)->setColPos(col->getColPos());
         ((ColExpression *) newExp)->setType(col->getDataType());
