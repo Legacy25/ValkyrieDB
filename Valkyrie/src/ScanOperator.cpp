@@ -22,12 +22,6 @@ void ScanOperator::convertToSchema(){
 		std::string colType = expressions[i].substr(t+1);
 		schema->addAttribute(colName, mapType(colType));
 	}
-
-	std::cout << std::endl << "TABLE-----------------" << std::endl;
-	unordered_map<string, Expression*> ml = schema->getColumnMap();
-	for(unordered_map<string, Expression*>::iterator it = ml.begin(); it != ml.end(); it++)
-		std::cout << " ;; " << it->second->toString();
-	std::cout << std::endl << "-----------------" << std::endl;
 }
 
 void ScanOperator::produce(){

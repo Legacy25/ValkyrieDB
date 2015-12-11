@@ -9,13 +9,6 @@ ProjectionOperator::ProjectionOperator(std::vector<std::string> expressionList, 
 	this->type = "PROJECT";
 	this->expressions = expressionList;
 	schema = children[0]->getSchema();
-
-	std::cout << std::endl << "PROJECT SCHEMA-----------------" << std::endl;
-	unordered_map<string, Expression*> lmap = schema->getColumnMap();
-	for(unordered_map<string, Expression*>::iterator it = lmap.begin(); it != lmap.end(); it++)
-		std::cout << " ;; " << it->second->toString();
-	std::cout << std::endl << "-----------------" << std::endl;
-
 	ExpressionParser parser;
 	bool allFound = false;
 	vector<string> attrs = schema->getAttributes();
@@ -36,13 +29,6 @@ ProjectionOperator::ProjectionOperator(std::vector<std::string> expressionList, 
 void ProjectionOperator::updateSchema(){
 	assert(projectionClauses.size() == expressions.size());
     Schema *old = codegen::getSchema();
-
-	std::cout << std::endl << "old-----------------" << std::endl;
-	unordered_map<string, Expression*> lmap = old->getColumnMap();
-	for(unordered_map<string, Expression*>::iterator it = lmap.begin(); it != lmap.end(); it++)
-		std::cout << " ;; " << it->second->toString();
-	std::cout << std::endl << "-----------------" << std::endl;
-
     Schema *schema = new Schema(old->getTableName());
     schema->setTuples(old->getTuples());
 	for(int i = 0; i < expressions.size(); i++){
@@ -65,13 +51,9 @@ void ProjectionOperator::updateExpression(Expression *newExp, unordered_map<std:
 	} else if(t == ExprType::COLEXPRESSION){
 		if(((ColExpression*)newExp)->getTableName() == "")
 			((ColExpression*)newExp)->setTableName(tableName);
-		std::cout << "project expression " << newExp->toString() << std::endl;
 		ColExpression* col = (ColExpression*)m[((ColExpression*)newExp)->getQualifiedName()];
-		std::cout << "project map has column" << std::endl;
 		((ColExpression*)newExp)->setColPos(col->getColPos());
-		std::cout << "project set pos" << std::endl;
 		((ColExpression*)newExp)->setType(col->getDataType());
-		std::cout << "project set type" << std::endl;
 	}
 }
 
