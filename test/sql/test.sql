@@ -15,5 +15,5 @@ WHERE
 GROUP BY lineitem.orderkey, orders.orderdate, orders.shippriority 
 ORDER BY revenue desc, orders.orderdate;*/
 
-select * from nation, region where nation.regionkey = region.regionkey;
+select nation.name, nation.nationkey from nation, region where nation.regionkey = region.regionkey;
 --select nation.name, region.name from nation, region where nation.regionkey = region.regionkey;

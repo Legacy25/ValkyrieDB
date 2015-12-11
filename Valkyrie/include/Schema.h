@@ -20,7 +20,7 @@ namespace valkyrie{
         vector<LeafValue *> tuples;
         bool materialized;
         unordered_map<string, valkyrie::Expression*> colMap;
-
+        string formatAttrName(string name) const;
     public:
         Schema(string tablename);
         Schema(string tablename, string datafile);

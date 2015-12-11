@@ -119,28 +119,28 @@ namespace valkyrie{
     private:
     public:
         Value* getValue();
-        string toString(){return "+";}
+        string toString(){return this->leftExpression->toString() + " + " + this->rightExpression->toString();}
     };
 
     class SubtractionExpression: public ArithExpression {
     private:
     public:
         Value* getValue();
-        string toString(){return "-";}
+        string toString(){return this->leftExpression->toString() + " - " + this->rightExpression->toString();}
     };
 
     class MultiplicationExpression: public ArithExpression {
     private:
     public:
         Value* getValue();
-        string toString(){return "*";}
+        string toString(){return this->leftExpression->toString() + " * " + this->rightExpression->toString();}
     };
 
     class DivisionExpression: public ArithExpression {
     private:
     public:
         Value* getValue();
-        string toString(){return "/";}
+        string toString(){return this->leftExpression->toString() + " / " + this->rightExpression->toString();}
     };
 
     // Logical Operators
@@ -148,14 +148,14 @@ namespace valkyrie{
     private:
     public:
         Value* getValue();
-        string toString(){return "AND";}
+        string toString(){return this->leftExpression->toString() + " AND " + this->rightExpression->toString();}
     };
 
     class OrExpression: public LogExpression {
     private:
     public:
         Value* getValue();
-        string toString(){return "OR";}
+        string toString(){return this->leftExpression->toString() + " OR " + this->rightExpression->toString();}
     };
 
     // Comparision Operators
@@ -164,28 +164,28 @@ namespace valkyrie{
     public:
         Value* getValue();
         ExprType getType(){ return ExprType::EQUALEXPRESSION; }
-        string toString(){return "=";}
+        string toString(){return this->leftExpression->toString() + " = " + this->rightExpression->toString();}
     };
 
     class NotEqualExpression: public CmpExpression {
     private:
     public:
         Value* getValue();
-        string toString(){return "<>";}
+        string toString(){return this->leftExpression->toString() + " <> " + this->rightExpression->toString();}
     };
 
     class LessThanExpression: public CmpExpression {
     private:
     public:
         Value* getValue();
-        string toString(){return "<";}
+        string toString(){return this->leftExpression->toString() + " < " + this->rightExpression->toString();}
     };
 
     class LessThanEqualExpression: public CmpExpression {
     private:
     public:
         Value* getValue();
-        string toString(){return "<=";}
+        string toString(){return this->leftExpression->toString() + " <= " + this->rightExpression->toString();}
     };
 
     class GreaterThanExpression: public CmpExpression {
@@ -193,14 +193,14 @@ namespace valkyrie{
     public:
         Value* getValue();
         ExprType getType(){ return ExprType::GREATERTHANEXPRESSION; }
-        string toString(){return ">";}
+        string toString(){return this->leftExpression->toString() + " > " + this->rightExpression->toString();}
     };
 
     class GreaterThanEqualExpression: public CmpExpression {
     private:
     public:
         Value* getValue();
-        string toString(){return ">=";}
+        string toString(){return this->leftExpression->toString() + " >= " + this->rightExpression->toString();}
     };
 
     // Primitives
@@ -278,8 +278,8 @@ namespace valkyrie{
         ExprType getType(){ return ExprType::COLEXPRESSION; }
         string toString(){
             if(index != -1)
-                return colname + "(" + std::to_string(index) + ", " + std::to_string(type) + ")";
-            return colname;
+                return tablename + "." + colname + "(" + std::to_string(index) + ", " + std::to_string(type) + ")";
+            return tablename + "." + colname;
         }
     };
 }

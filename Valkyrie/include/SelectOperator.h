@@ -8,7 +8,7 @@
 namespace valkyrie{
 	class SelectOperator : public Operator {
 		Expression* selectClause;
-		void updateExpression(Expression *newExp, unordered_map<string, Expression *> m);
+		void updateExpression(Expression *newExp, unordered_map<string, Expression *> m, std::string tableName);
 	public:
 		SelectOperator(std::vector<std::string> expressions, std::vector<Operator*> children);
 		void consume();
