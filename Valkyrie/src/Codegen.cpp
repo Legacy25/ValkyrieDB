@@ -433,7 +433,7 @@ void hasher(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
 //    cout << "HASHTABLE\n\n\n" << endl;
 //    cout << "keystr " << keyStr << "newt " << newt << endl;
     op->hashtable[keyStr].push_back(*newt);
-//
+
 //    for(auto it = op->hashtable.begin(); it != op->hashtable.end(); it++){
 //        cout << it->first << "=>" << it->second.size() << endl;
 //        for(int i = 0; i < it->second.size(); i++){
@@ -471,9 +471,9 @@ void joiner(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
         for(int j=0; j<ac; j++) {
             joinedTuple->push_back(tup[j]);
         }
-//        for(int k = 0; k < joinedTuple->size(); k++){
+        for(int k = 0; k < joinedTuple->size(); k++){
 //            cout << (*joinedTuple)[k] << " ";
-//        }
+        }
 //        cout << endl;
         op->getSchema()->addTuple(&((*joinedTuple)[0]));
     }

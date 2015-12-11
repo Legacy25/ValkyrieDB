@@ -15,41 +15,8 @@ JoinOperator::JoinOperator(std::vector<std::string> expressionList, std::vector<
     ExpressionParser parser;
     joinClause = parser.parse(expressions[0])[0];
 
-    std::cout << std::endl << "LMAP-----------------" << std::endl;
-    unordered_map<string, Expression*> lmap = lsch->getColumnMap();
-    for(unordered_map<string, Expression*>::iterator it = lmap.begin(); it != lmap.end(); it++)
-        std::cout << " ;; " << it->first;
-    std::cout << std::endl << "-----------------" << std::endl;
-
-    std::cout << std::endl << "RMAP-----------------" << std::endl;
-    unordered_map<string, Expression*> rmap = rsch->getColumnMap();
-    for(unordered_map<string, Expression*>::iterator it = rmap.begin(); it != rmap.end(); it++)
-        std::cout << " ;; " << it->first;
-    std::cout << std::endl << "-----------------" << std::endl;
-
     updateExpression(joinClause, lsch->getColumnMap(), rsch->getColumnMap(), lsch->getTableName(), rsch->getTableName());
     schema = mergeSchemas(lsch, rsch);
-    unordered_map<string, Expression*> colMap = schema->getColumnMap();
-    for(unordered_map<string, Expression*>::iterator it = colMap.begin(); it != colMap.end(); it++)
-        updateExpression(it->second, lsch->getColumnMap(), rsch->getColumnMap(), lsch->getTableName(), rsch->getTableName());
-
-    std::cout << std::endl << "LEFT-----------------" << std::endl;
-    unordered_map<string, Expression*> ml = lsch->getColumnMap();
-    for(unordered_map<string, Expression*>::iterator it = ml.begin(); it != ml.end(); it++)
-        std::cout << " ;; " << it->second->toString();
-    std::cout << std::endl << "-----------------" << std::endl;
-
-    std::cout << std::endl << "RIGHT-----------------" << std::endl;
-    unordered_map<string, Expression*> mr = rsch->getColumnMap();
-    for(unordered_map<string, Expression*>::iterator it = mr.begin(); it != mr.end(); it++)
-        std::cout << " ;; " << it->second->toString();
-    std::cout << std::endl << "-----------------" << std::endl;
-
-    std::cout << std::endl << "JOIN-----------------" << std::endl;
-    unordered_map<string, Expression*> m = schema->getColumnMap();
-    for(unordered_map<string, Expression*>::iterator it = m.begin(); it != m.end(); it++)
-        std::cout << " ;; " << it->second->toString();
-    std::cout << std::endl << "-----------------" << std::endl;
 }
 
 void JoinOperator::consume() {
@@ -81,6 +48,11 @@ void JoinOperator::produce() {
     children[1]->produce();
 //    LeafValue *dummy = new LeafValue[schema->getAttributes().size()];
 //    schema->addTuple(dummy);
+
+    Schema *lsch = children[0]->getSchema(), *rsch = children[1]->getSchema();
+    unordered_map<string, Expression*> colMap = schema->getColumnMap();
+    for(unordered_map<string, Expression*>::iterator it = colMap.begin(); it != colMap.end(); it++)
+        updateExpression(it->second, lsch->getColumnMap(), rsch->getColumnMap(), lsch->getTableName(), rsch->getTableName());
     codegen::joinConsume(*schema, parent);
 }
 
