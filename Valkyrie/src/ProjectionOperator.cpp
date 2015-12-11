@@ -29,52 +29,41 @@ ProjectionOperator::ProjectionOperator(std::vector<std::string> expressionList, 
 void ProjectionOperator::updateSchema(){
 	assert(projectionClauses.size() == expressions.size());
     Schema *old = codegen::getSchema();
+
+	std::cout << std::endl << "old-----------------" << std::endl;
+	unordered_map<string, Expression*> lmap = old->getColumnMap();
+	for(unordered_map<string, Expression*>::iterator it = lmap.begin(); it != lmap.end(); it++)
+		std::cout << " ;; " << it->first;
+	std::cout << std::endl << "-----------------" << std::endl;
+
     Schema *schema = new Schema(old->getTableName());
     schema->setTuples(old->getTuples());
-    unordered_map<string, Expression*> nschema;
 	for(int i = 0; i < expressions.size(); i++){
 		std::size_t pos = expressions[i].find(" AS ");
         //TODO check the random column name assignment
 		std::string colName = pos == std::string::npos ? "default_" + std::to_string(i) : expressions[i].substr(0, pos);
-		updateExpression(projectionClauses[i], old->getColumnMap());
-        nschema.insert(std::make_pair(colName, projectionClauses[i]));
-		schema->addAttribute(colName, projectionClauses[i]->getDataType());
+		updateExpression(projectionClauses[i], old->getColumnMap(), old->getTableName());
+		schema->addAttribute(colName, projectionClauses[i]->getDataType(), projectionClauses[i]);
 	}
-	schema->setColumnMap(nschema);
     codegen::setSchema(schema);
 }
 
-void ProjectionOperator::updateExpression(Expression *newExp, unordered_map<std::string, Expression *> m) {
+void ProjectionOperator::updateExpression(Expression *newExp, unordered_map<std::string, Expression *> m, string tableName) {
 	ExprType t = newExp->getType();
 	if(t != ExprType::COLEXPRESSION && t != ExprType::DOUBLEVALUEEXPRESSION && t != ExprType::STRINGVALUEEXPRESSION &&
 			t != ExprType::LONGVALUEEXPRESSION && t != ExprType::DATEVALUEEXPRESSION){
 		BinaryExpression* b = (BinaryExpression*)newExp;
-		if(b->getLeftExpression()->getType() == ExprType::COLEXPRESSION){
-			ColExpression* col = (ColExpression*)b->getLeftExpression();
-			//TODO check if the index is set on all leaf columns of all trees
-			if(col->getColPos() == -1){
-				assert(m.find(col->getColName()) != m.end());
-				b->setLeftExpression(m[col->getColName()]);
-			}
-		} else {
-			updateExpression(b->getLeftExpression(), m);
-		}
-		if(b->getRightExpression()->getType() == ExprType::COLEXPRESSION){
-			ColExpression* col = (ColExpression*)b->getRightExpression();
-			if(col->getColPos() == -1){
-				assert(m.find(col->getColName()) != m.end());
-				b->setRightExpression(m[col->getColName()]);
-			}
-		} else {
-			updateExpression(b->getRightExpression(), m);
-		}
-	} else {
-		if(t == ExprType::COLEXPRESSION){
-			ColExpression* col = (ColExpression*)m[((ColExpression*)newExp)->getColName()];
-			((ColExpression*)newExp)->setColPos(col->getColPos());
-			((ColExpression*)newExp)->setType(col->getDataType());
-			((ColExpression*)newExp)->setTableName(col->getTableName());
-		}
+		updateExpression(b->getLeftExpression(), m, tableName);
+		updateExpression(b->getRightExpression(), m, tableName);
+	} else if(t == ExprType::COLEXPRESSION){
+		((ColExpression*)newExp)->setTableName(tableName);
+		std::cout << "project expression " << newExp->toString() << std::endl;
+		ColExpression* col = (ColExpression*)m[((ColExpression*)newExp)->getQualifiedName()];
+		std::cout << "project map has column" << std::endl;
+		((ColExpression*)newExp)->setColPos(col->getColPos());
+		std::cout << "project set pos" << std::endl;
+		((ColExpression*)newExp)->setType(col->getDataType());
+		std::cout << "project set type" << std::endl;
 	}
 }
 

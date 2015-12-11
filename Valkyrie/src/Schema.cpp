@@ -51,13 +51,15 @@ Schema::Schema(string tablename, string datafile) : datafile(datafile) {
     materialized = false;
 }
 
-void Schema::addAttribute(string attr, DataType t) {
+void Schema::addAttribute(string colName, DataType t) {
+    string attr = formatAttrName(colName);
     attributes.push_back(attr);
     types.push_back(t);
     colMap.insert(make_pair(attr, new ColExpression(attr, attributes.size()-1, t)));
 }
 
-void Schema::addAttribute(string attr, DataType t, Expression *expression) {
+void Schema::addAttribute(string colName, DataType t, Expression *expression) {
+    string attr = formatAttrName(colName);
     attributes.push_back(attr);
     types.push_back(t);
     colMap.insert(make_pair(attr, expression));
@@ -151,7 +153,8 @@ void Schema::setTableName(string tablename) {
     this->tablename = tablename;
 }
 
-size_t Schema::getAttributePos(string colName) const {
+size_t Schema::getAttributePos(string attr) const {
+    string colName = formatAttrName(attr);
     for(size_t i =0; i < attributes.size(); i++){
         if(attributes.at(i) == colName){
             return  i;
@@ -160,10 +163,13 @@ size_t Schema::getAttributePos(string colName) const {
     std::cerr << "colName " << colName << " NOT Found" <<std::endl;
     exit(-1);
 }
+
 string Schema::getTableName() const{
     return tablename;
 }
-DataType Schema::getAttributeType(string colName) const {
+
+DataType Schema::getAttributeType(string attr) const {
+    string colName = formatAttrName(attr);
     for(size_t i =0; i < attributes.size(); i++){
         if(attributes.at(i) == colName){
             return  types.at(i);
@@ -185,7 +191,8 @@ void Schema::setColumnMap(unordered_map<string, valkyrie::Expression *> m) {
     this->colMap = m;
 }
 
-Expression *Schema::getAttrExpression(string colName) {
+Expression *Schema::getAttrExpression(string attr) {
+    string colName = formatAttrName(attr);
     if(colMap.find(colName) == colMap.end())
         return NULL;
     return colMap[colName];
@@ -193,4 +200,11 @@ Expression *Schema::getAttrExpression(string colName) {
 
 void Schema::addTuple(LeafValue *lv) {
     tuples.push_back(lv);
+}
+
+string Schema::formatAttrName(string name) const {
+    //Check if the column name has table name with it, if not, then return qualified name
+    if(name.find(".") == string::npos)
+        return tablename + "." + name;
+    return name;
 }
