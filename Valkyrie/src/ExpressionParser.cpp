@@ -6,6 +6,11 @@
 
 using namespace valkyrie;
 
+static void raise_exception() {
+	cout << "Parse Exception!" << endl;
+	exit(-1);
+}
+
 ExpressionParser::ExpressionParser(){
 	arithmeticOperators.insert("+");
 	arithmeticOperators.insert("-");
@@ -38,6 +43,7 @@ BinaryExpression* ExpressionParser::logicalExpression(std::string s){
 		return new AndExpression();
 	if(s == "OR")
 		return new OrExpression();
+	raise_exception();
 	return NULL;
 }
 
@@ -66,6 +72,7 @@ Expression* ExpressionParser::leafExpression(std::string s){
 	}else{
 		return new ColExpression(s);
 	}
+	raise_exception();
 	return NULL;
 }
 
@@ -91,6 +98,7 @@ Expression* ExpressionParser::parseExpression(std::string exp){
 			return op;
 		}
 	}
+	raise_exception();
 	return NULL;
 }
 

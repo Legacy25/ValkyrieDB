@@ -12,7 +12,11 @@ enum DataType {
     DATE
 };
 
-typedef int64_t LeafValue;
+typedef union {
+    long l;
+    double d;
+    char* c;
+} LeafValue;
 
 typedef struct tuplePointer {
     int64_t ptr;

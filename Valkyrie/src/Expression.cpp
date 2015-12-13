@@ -80,12 +80,34 @@ Value* OrExpression::getValue() {
  * using getelementptr and invoking ICmp on them
  */
 
+static ExprType convertDTtoET(DataType dt) {
+    switch(dt) {
+        case LONG:
+            return LONGVALUEEXPRESSION;
+        case DOUBLE:
+            return DOUBLEVALUEEXPRESSION;
+        case DATE:
+            return DATEVALUEEXPRESSION;
+        case STRING:
+            return STRINGVALUEEXPRESSION;
+        default:
+            cout << "Unknown dt to et conversion!" << endl;
+            exit(-1);
+    }
+}
+
 Value* EqualExpression::getValue() {
     assert(leftExpression != NULL);
     assert(rightExpression != NULL);
     assert(leftExpression->getType() == rightExpression->getType());
     IRBuilder<>* builder = codegen::getBuilder();
-    switch(rightExpression->getType()) {
+    int c;
+    if(leftExpression->getType() != COLEXPRESSION) {
+        c = leftExpression->getType();
+    } else {
+        c = convertDTtoET(leftExpression->getDataType());
+    }
+    switch(c) {
         case LONGVALUEEXPRESSION:
             return builder->CreateICmpEQ(leftExpression->getValue(), rightExpression->getValue());
         case DOUBLEVALUEEXPRESSION:
@@ -169,7 +191,13 @@ Value* NotEqualExpression::getValue() {
     assert(leftExpression->getType() == rightExpression->getType());
 
     IRBuilder<>* builder = codegen::getBuilder();
-    switch(leftExpression->getType()) {
+    int c;
+    if(leftExpression->getType() != COLEXPRESSION) {
+        c = leftExpression->getType();
+    } else {
+        c = convertDTtoET(leftExpression->getDataType());
+    }
+    switch(c) {
         case LONGVALUEEXPRESSION:
             return builder->CreateICmpNE(leftExpression->getValue(), rightExpression->getValue());
         case DOUBLEVALUEEXPRESSION:
@@ -192,7 +220,13 @@ Value* GreaterThanExpression::getValue() {
     assert(leftExpression->getType() == rightExpression->getType());
 
     IRBuilder<>* builder = codegen::getBuilder();
-    switch(rightExpression->getType()) {
+    int c;
+    if(leftExpression->getType() != COLEXPRESSION) {
+        c = leftExpression->getType();
+    } else {
+        c = convertDTtoET(leftExpression->getDataType());
+    }
+    switch(c) {
         case LONGVALUEEXPRESSION:
             return builder->CreateICmpSGT(leftExpression->getValue(), rightExpression->getValue());
         case DOUBLEVALUEEXPRESSION:
@@ -215,7 +249,13 @@ Value* GreaterThanEqualExpression::getValue() {
     assert(leftExpression->getType() == rightExpression->getType());
 
     IRBuilder<>* builder = codegen::getBuilder();
-    switch(leftExpression->getType()) {
+    int c;
+    if(leftExpression->getType() != COLEXPRESSION) {
+        c = leftExpression->getType();
+    } else {
+        c = convertDTtoET(leftExpression->getDataType());
+    }
+    switch(c) {
         case LONGVALUEEXPRESSION:
             return builder->CreateICmpSGE(leftExpression->getValue(), rightExpression->getValue());
         case DOUBLEVALUEEXPRESSION:
@@ -238,7 +278,13 @@ Value* LessThanExpression::getValue() {
     assert(leftExpression->getType() == rightExpression->getType());
 
     IRBuilder<>* builder = codegen::getBuilder();
-    switch(leftExpression->getType()) {
+    int c;
+    if(leftExpression->getType() != COLEXPRESSION) {
+        c = leftExpression->getType();
+    } else {
+        c = convertDTtoET(leftExpression->getDataType());
+    }
+    switch(c) {
         case LONGVALUEEXPRESSION:
             return builder->CreateICmpSLT(leftExpression->getValue(), rightExpression->getValue());
         case DOUBLEVALUEEXPRESSION:
@@ -261,7 +307,13 @@ Value* LessThanEqualExpression::getValue() {
     assert(leftExpression->getType() == rightExpression->getType());
 
     IRBuilder<>* builder = codegen::getBuilder();
-    switch(leftExpression->getType()) {
+    int c;
+    if(leftExpression->getType() != COLEXPRESSION) {
+        c = leftExpression->getType();
+    } else {
+        c = convertDTtoET(leftExpression->getDataType());
+    }
+    switch(c) {
         case LONGVALUEEXPRESSION:
             return builder->CreateICmpSLE(leftExpression->getValue(), rightExpression->getValue());
         case DOUBLEVALUEEXPRESSION:
@@ -372,18 +424,22 @@ Value* ColExpression::getValue() {
     IRBuilder<>* builder = codegen::getBuilder();
     DataType dt = codegen::getAttType(index);
     Value* tupleptr = codegen::getTupleptr();
+
     Value *indices[1];
     indices[0] = ConstantInt::get(Type::getInt32Ty(getGlobalContext()), (uint64_t) index);
     ArrayRef<Value*> indicesRef(indices);
-    Value *data = builder->CreateLoad(builder->CreateInBoundsGEP(tupleptr, indicesRef));
+
+    Value *dataptr = builder->CreateInBoundsGEP(tupleptr, indicesRef);
+
     switch(dt){
-        case LONG:
-            return data;
         case DOUBLE:
-            return builder->CreateUIToFP(data, Type::getDoubleTy(getGlobalContext()));
+            return builder->CreateLoad(
+                    builder->CreateBitCast(dataptr, Type::getDoublePtrTy(getGlobalContext()))
+            );
+        case LONG:
         case STRING:
         case DATE:
-            return data;
+            return builder->CreateLoad(dataptr);
     }
 }
 

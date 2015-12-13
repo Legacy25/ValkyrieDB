@@ -110,6 +110,9 @@ public class Main {
 				dataDirs.add(args[i+1]);
 				i++;
 			}
+			else if(args[i].equalsIgnoreCase("--exec")) {
+				EXECUTE = true;
+			}
 			else if(args[i].equalsIgnoreCase("--swap")) {
 				SWAP = new File(args[i+1]);
 				MEMORY_LIMITED = true;

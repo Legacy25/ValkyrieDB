@@ -292,7 +292,7 @@ void codegen::printConsume(int *types) {
         Expression* exp = gschema->getAttrExpression(cols[i]);
         switch(t[i]){
             case DataType::DOUBLE:
-                builder->CreateCall(printfFunc, vector<Value*>({doubleFmt, exp->getValue()}));
+                builder->CreateCall(printfFunc, vector<Value*>({doubleFmt, builder->CreateBitCast(exp->getValue(), Type::getDoubleTy(context))}));
                 break;
             case DataType::LONG:
                 builder->CreateCall(printfFunc, vector<Value*>({longFmt, exp->getValue()}));
@@ -428,7 +428,7 @@ void hasher(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
     string keyStr = "";
     for(int i=0; i<keySize; i++) {
 //        cout << key[i] << ", ";
-        keyStr += to_string(key[i])+".";
+        keyStr += to_string(key[i].l)+".";
     }
 //    cout << "HASHTABLE\n\n\n" << endl;
 //    cout << "keystr " << keyStr << "newt " << newt << endl;
@@ -460,7 +460,7 @@ void joiner(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
     string keyStr = "";
     for(int i=0; i<keySize; i++) {
 //        cout << key[i] << ", ";
-        keyStr += to_string(key[i])+".";
+        keyStr += to_string(key[i].l)+".";
     }
 //    cout << endl;
 

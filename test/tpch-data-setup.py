@@ -1,28 +1,37 @@
 #!/usr/bin/python
 
 import os
+import shutil
 import subprocess
 import glob
 import sqlite3
 
+home = os.path.dirname(os.path.realpath(__file__))
 tpchgenrepo = "git@github.com:Legacy25/tpch-dbgen.git"
 tpchdb = "tpch.db"
+sf = "1"
 
 def clonerepo(repo):
+	os.chdir(home)
+	if(os.path.exists("tpch-dbgen")):
+		shutil.rmtree("tpch-dbgen")
 	subprocess.call(["git", "clone", repo])
 
 def initdatafolder():
+	if(os.path.exists("data")):
+		shutil.rmtree("data")
 	os.mkdir("data")
 	os.chdir("tpch-dbgen")
 	subprocess.call(["make"])
-	subprocess.call(["./dbgen", "-s", "0.1"])
+	subprocess.call(["./dbgen", "-s", sf])
 	tblfiles = glob.glob("*.tbl")
 	for f in tblfiles:
 		os.rename(f, os.path.join("../data", f))
-
 	os.chdir("..")
 
 def createDB(dbname):
+	if(os.path.exists(tpchdb)):
+		os.remove(tpchdb)
 	conn = sqlite3.connect(tpchdb)
 	return conn.cursor()
 

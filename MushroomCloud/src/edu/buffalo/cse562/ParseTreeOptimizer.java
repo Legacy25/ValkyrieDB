@@ -72,7 +72,7 @@ public class ParseTreeOptimizer {
 		
 		/* Push down projections */
 		if(!(parseTree instanceof ScanOperator))
-			//parseTree = pushDownProjections(parseTree);
+			parseTree = pushDownProjections(parseTree);
 		
 		/* Decompose Select Clauses and push them down appropriately */
 		parseTree = initialSelectionDecomposition(parseTree);

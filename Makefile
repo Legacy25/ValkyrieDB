@@ -8,7 +8,7 @@ OBJ_PATH  = $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(OBJ_FILES))
 
 LIBS= 
 CC=clang++-3.5
-CFLAGS=-rdynamic -g -O0 `llvm-config-3.5 --cxxflags --ldflags --system-libs --libs core mcjit native bitwriter`
+CFLAGS=-rdynamic -g -O3 -m64 `llvm-config-3.5 --cxxflags --ldflags --system-libs --libs core mcjit native bitwriter`
 
 all: init mushroomcloud valkyrie
 

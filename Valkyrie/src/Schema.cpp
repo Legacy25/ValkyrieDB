@@ -86,16 +86,16 @@ void Schema::materialize() {
             while(getline(linestream, str, '|')) {
                 switch(types.at(i)) {
                     case LONG:
-                    tuple[i] = (int64_t) stol(str);
+                    tuple[i].l = stol(str);
                     break;
                     case DOUBLE:
-                    tuple[i] = (int64_t) stod(str);
+                    tuple[i].d = stod(str);
                     break;
                     case STRING:
                     case DATE:
                     unsigned long buf_size = str.size()+1;
-                    tuple[i] = (int64_t) new char[buf_size];
-                    memcpy((char *)tuple[i], str.c_str(), buf_size);
+                    tuple[i].c = new char[buf_size];
+                    memcpy(tuple[i].c, str.c_str(), buf_size);
                     break;
                 }
                 i++;
