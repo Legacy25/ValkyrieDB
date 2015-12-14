@@ -3,7 +3,7 @@ CREATE TABLE LINEITEM (
         partkey        INT,
         suppkey        INT REFERENCES SUPPLIERS,
         linenumber     INT,
-        quantity       DECIMAL,
+        quantity       INT,
         extendedprice  DECIMAL,
         discount       DECIMAL,
         tax            DECIMAL,
