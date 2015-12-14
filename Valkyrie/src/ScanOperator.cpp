@@ -32,7 +32,7 @@ void ScanOperator::produce(){
 }
 
 void ScanOperator::consume(){
-	schema->materialize();
+	schema->init();
 	//schema->dump();
 	codegen::scanConsume(*schema, parent);
 }

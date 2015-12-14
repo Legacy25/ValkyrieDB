@@ -44,11 +44,91 @@ string Schema::attrsVecsToCommaSepString(const vector<string>& attr, const vecto
 
 Schema::Schema(string tablename) {
     setTableName(tablename);
+    infile = NULL;
 }
 
 Schema::Schema(string tablename, string datafile) : datafile(datafile) {
     setTableName(tablename);
-    materialized = false;
+    infile = NULL;
+}
+
+void Schema::init() {
+    if(infile != NULL) {
+        close();
+    }
+
+    assert(infile == NULL);
+
+    infile = new ifstream(datafile);
+
+    if(!infile) {
+        cout << "Error, datafile invalid" << endl;
+        exit(-1);
+    }
+}
+
+uint64_t Schema::loadBlock() {
+
+    assert(infile != NULL);
+
+    for(auto i : tuples) {
+        delete(i);
+    }
+    tuples.clear();
+
+    assert(tuples.size() == 0);
+
+    string line;
+    uint64_t k = 0;
+
+    while(getline(*infile, line)) {
+        unsigned long n = attributes.size();
+        LeafValue *tuple = new LeafValue[n];
+        stringstream linestream;
+        linestream.str(line);
+        string str;
+
+        int i=0;
+        while(getline(linestream, str, '|')) {
+            switch(types.at(i)) {
+                case LONG:
+                    tuple[i].l = stol(str);
+                    break;
+                case DOUBLE:
+                    tuple[i].d = stod(str);
+                    break;
+                case STRING:
+                case DATE:
+                    unsigned long buf_size = str.size()+1;
+                    tuple[i].c = new char[buf_size];
+                    memcpy(tuple[i].c, str.c_str(), buf_size);
+                    break;
+            }
+            i++;
+        }
+        tuples.push_back(tuple);
+        k++;
+        if(k >= VDB_BLOCK_SIZE) break;
+    }
+
+    return k;
+}
+
+uint64_t Schema::close() {
+    if(infile != NULL) {
+        infile->close();
+        delete(infile);
+        infile = NULL;
+    }
+
+    if(tuples.size() > 0) {
+        for(auto i : tuples) {
+            delete(i);
+        }
+        tuples.clear();
+    }
+
+    return 0;
 }
 
 void Schema::addAttribute(string colName, DataType t) {
@@ -65,55 +145,7 @@ void Schema::addAttribute(string colName, DataType t, Expression *expression) {
     colMap.insert(make_pair(attr, expression));
 }
 
-void Schema::materialize() {
-    if(materialized)
-        return;
 
-    ifstream infile(datafile);
-
-    if(infile) {
-        string line;
-
-        while(getline(infile, line)) {
-
-            unsigned long n = attributes.size();
-            LeafValue *tuple = new LeafValue[n];
-            stringstream linestream;
-            linestream.str(line);
-            string str;
-
-            int i=0;
-            while(getline(linestream, str, '|')) {
-                switch(types.at(i)) {
-                    case LONG:
-                    tuple[i].l = stol(str);
-                    break;
-                    case DOUBLE:
-                    tuple[i].d = stod(str);
-                    break;
-                    case STRING:
-                    case DATE:
-                    unsigned long buf_size = str.size()+1;
-                    tuple[i].c = new char[buf_size];
-                    memcpy(tuple[i].c, str.c_str(), buf_size);
-                    break;
-                }
-                i++;
-            }
-            tuples.push_back(tuple);
-        }
-        infile.close();
-    }
-    else {
-        return;
-    }
-
-    materialized = true;
-}
-
-bool Schema::isMaterialized() const {
-    return materialized;
-}
 
 ostream& operator<<(ostream &stream, const  Schema &schema) {
     string attrs = schema.attrsVecsToCommaSepString(schema.getAttributes(), schema.getTypes());

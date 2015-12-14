@@ -13,11 +13,21 @@
 #include "Expression.h"
 #include "JoinOperator.h"
 
+
+typedef enum {
+    GET_PTR,
+    GET_SIZE,
+    LD_BLK,
+    CLOSE
+} SCHEMA_OP;
+
+
 using namespace llvm;
 using namespace std;
 using namespace valkyrie;
 
 namespace codegen {
+
     void initialize(std::string);
     ExecutionEngine* compile();
 

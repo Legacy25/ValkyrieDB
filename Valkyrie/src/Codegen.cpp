@@ -12,6 +12,7 @@
 #include "../include/Codegen.h"
 #include "../include/Schema.h"
 #include "../include/Expression.h"
+#include "../include/DataTypes.h"
 
 using namespace llvm;
 using namespace std;
@@ -23,7 +24,7 @@ static Module *module;
 static IRBuilder<> *builder;
 
 /* Declaration of llvm functions */
-static Function *mainFunction, *hashFunction, *joinFunction, *sizeFunction, *getpointerFunction;
+static Function *mainFunction, *hashFunction, *joinFunction, *schControlFunction;
 static Constant *printfFunc;
 
 /* Useful codegen variables */
@@ -72,8 +73,6 @@ void codegen::initialize(string ModuleName) {
     FunctionType *printfType = FunctionType::get(int32Type, printfArgsTypes, true);
     printfFunc = module->getOrInsertFunction("printf", printfType);
 
-    // Declare the hash function
-
     // The main function
     FunctionType *mainFunctionType = FunctionType::get(
             int32Type,
@@ -113,29 +112,16 @@ void codegen::initialize(string ModuleName) {
             module
     );
 
-    // The size function
-    FunctionType *sizeFunctionType = FunctionType::get(
+    // The schema controller function
+    FunctionType *schControlFunctionType = FunctionType::get(
             Type::getInt64Ty(context),
-            ArrayRef<Type *>({int64Type}),
+            ArrayRef<Type *>({int64Type, int32Type}),
             false
     );
-    sizeFunction = Function::Create(
-            sizeFunctionType,
+    schControlFunction = Function::Create(
+            schControlFunctionType,
             Function::ExternalLinkage,
-            "sizer",
-            module
-    );
-
-    // The size function
-    FunctionType *getpointerFunctionType = FunctionType::get(
-            Type::getInt64Ty(context),
-            ArrayRef<Type *>({int64Type}),
-            false
-    );
-    getpointerFunction = Function::Create(
-            getpointerFunctionType,
-            Function::ExternalLinkage,
-            "getpointer",
+            "schemaController",
             module
     );
 
@@ -180,17 +166,44 @@ ExecutionEngine* codegen::compile() {
 void codegen::scanConsume(Schema& schema, valkyrie::Operator *parent) {
     gschema = &schema;
     Type *ptrToPtr = PointerType::get(int64PtrType, 0);
-    Value *ptr = builder->CreateIntToPtr(ConstantInt::get(int64Type, schema.getTuplePtr()), ptrToPtr);
+
+    BasicBlock *dataBlock = BasicBlock::Create(context, "blockloader" + to_string(nameCtr++), mainFunction);
+    BasicBlock *afterDataBlock = BasicBlock::Create(context, "afterblockloader" + to_string(nameCtr++), mainFunction);
+    BasicBlock *loopHead = BasicBlock::Create(context, "loophead" + to_string(nameCtr++), mainFunction);
+
+
+    builder->CreateBr(dataBlock);
+    builder->SetInsertPoint(dataBlock);
+
+    Value *args[2];
+    args[0] = ConstantInt::get(int64Type, (uint64_t) &schema);
+    args[1] = ConstantInt::get(int64Type, LD_BLK);
+    ArrayRef<Value*> argsRef(args);
+    tc = builder->CreateCall(schControlFunction, argsRef);
+
+    builder->CreateCondBr(
+            builder->CreateICmpNE(tc, ConstantInt::get(int64Type, 0)),
+            loopHead,
+            afterDataBlock
+    );
+
+    builder->SetInsertPoint(loopHead);
+
+    Value* gpargs[2];
+    gpargs[0] = ConstantInt::get(int64Type, (uint64_t) &schema);
+    gpargs[1] = ConstantInt::get(int64Type, GET_PTR);
+    ArrayRef<Value *> gpargsRef(gpargs);
+
+    Value *ptr = builder->CreateIntToPtr(builder->CreateCall(schControlFunction, gpargsRef), ptrToPtr);
     ac = ConstantInt::get(int32Type, schema.getAttributes().size());
-    tc = ConstantInt::get(int32Type, schema.getTupleCount());
 
     Value *loopVar =
             builder->CreateAlloca(
-                    int32Type,
-                    ConstantInt::get(int32Type, 1),
+                    int64Type,
+                    ConstantInt::get(int64Type, 1),
                     "loopVar" + to_string(nameCtr++)
             );
-    builder->CreateStore(ConstantInt::get(int32Type, 0), loopVar);
+    builder->CreateStore(ConstantInt::get(int64Type, 0), loopVar);
 
     BasicBlock *loopBody = BasicBlock::Create(context, "loopBody" + to_string(nameCtr++), mainFunction);
     builder->CreateBr(loopBody);
@@ -210,11 +223,16 @@ void codegen::scanConsume(Schema& schema, valkyrie::Operator *parent) {
 
     Value *inc = builder->CreateAdd(i, ConstantInt::get(int32Type, 1));
     builder->CreateStore(inc, loopVar);
-    BasicBlock *afterLoop = BasicBlock::Create(context, "afterloop"+to_string(nameCtr++), mainFunction);
     Value *cmp = builder->CreateICmpSLT(inc, tc);
-    builder->CreateCondBr(cmp, loopBody, afterLoop);
+    builder->CreateCondBr(cmp, loopBody, dataBlock);
 
-    builder->SetInsertPoint(afterLoop);
+    builder->SetInsertPoint(afterDataBlock);
+
+    Value* clargs[2];
+    clargs[0] = ConstantInt::get(int64Type, (uint64_t) &schema);
+    clargs[1] = ConstantInt::get(int64Type, CLOSE);
+    ArrayRef<Value*> clargsRef(clargs);
+    builder->CreateCall(schControlFunction, clargsRef);
 }
 
 
@@ -222,13 +240,20 @@ void codegen::scanConsume(Schema& schema, valkyrie::Operator *parent) {
 void codegen::joinConsume(Schema& schema, valkyrie::Operator *parent) {
     gschema = &schema;
     Type *ptrToPtr = PointerType::get(int64PtrType, 0);
-    Value* args[1];
-    args[0] = ConstantInt::get(int64Type, (int64_t)gschema);
-    ArrayRef<Value *> argsRef(args);
-    Value *ptr = builder->CreateIntToPtr(builder->CreateCall(getpointerFunction, argsRef), ptrToPtr);
+
+    Value* gpargs[2];
+    gpargs[0] = ConstantInt::get(int64Type, (uint64_t) &schema);
+    gpargs[1] = ConstantInt::get(int64Type, GET_PTR);
+    ArrayRef<Value *> gpargsRef(gpargs);
+
+    Value* gsargs[2];
+    gsargs[0] = ConstantInt::get(int64Type, (uint64_t) &schema);
+    gsargs[1] = ConstantInt::get(int64Type, GET_SIZE);
+    ArrayRef<Value *> gsargsRef(gsargs);
+
+    Value *ptr = builder->CreateIntToPtr(builder->CreateCall(schControlFunction, gpargsRef), ptrToPtr);
     ac = ConstantInt::get(int32Type, schema.getAttributes().size());
-    tc = builder->CreateCall(sizeFunction, argsRef);
-//    tc = ConstantInt::get(int64Type, 25);
+    tc = builder->CreateCall(schControlFunction, gsargsRef);
 
     Value *loopVar =
             builder->CreateAlloca(
@@ -236,7 +261,7 @@ void codegen::joinConsume(Schema& schema, valkyrie::Operator *parent) {
                     ConstantInt::get(int64Type, 1),
                     "loopVar" + to_string(nameCtr++)
             );
-    builder->CreateStore(ConstantInt::get(int64Type, 1), loopVar);
+    builder->CreateStore(ConstantInt::get(int64Type, 0), loopVar);
 
     BasicBlock *condCheck = BasicBlock::Create(context, "condCheck" + to_string(nameCtr++), mainFunction);
     BasicBlock *loopBody = BasicBlock::Create(context, "loopBody" + to_string(nameCtr++), mainFunction);
@@ -267,6 +292,12 @@ void codegen::joinConsume(Schema& schema, valkyrie::Operator *parent) {
     builder->CreateBr(condCheck);
 
     builder->SetInsertPoint(afterLoop);
+
+    Value* clargs[2];
+    clargs[0] = ConstantInt::get(int64Type, (uint64_t) &schema);
+    clargs[1] = ConstantInt::get(int64Type, CLOSE);
+    ArrayRef<Value*> clargsRef(clargs);
+    builder->CreateCall(schControlFunction, clargsRef);
 }
 
 
@@ -315,7 +346,7 @@ void codegen::joinLeftConsume(JoinOperator* op) {
     LeafValue *tuple = new LeafValue[cols.size()]; // Don't call delete on this
     LeafValue *keys = new LeafValue[left.size()];
 
-    Value* tempPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)tuple), int64PtrType);
+    Value *tempPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)tuple), int64PtrType);
     Value *keyPtr = builder->CreateIntToPtr(ConstantInt::get(int64Type, (int64_t)keys), int64PtrType);
 
     // Copy val and call hashmap on ptr
@@ -419,31 +450,14 @@ void hasher(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
 
     vector<LeafValue> *newt = new vector<LeafValue>();
 
-//    cout << "Hasher called" << endl;
     for(int i=0; i<ac; i++) {
-//        cout << tup[i] << ", ";
         newt->push_back(tup[i]);
     }
-//    cout << " || KEYS: ";
     string keyStr = "";
     for(int i=0; i<keySize; i++) {
-//        cout << key[i] << ", ";
         keyStr += to_string(key[i].l)+".";
     }
-//    cout << "HASHTABLE\n\n\n" << endl;
-//    cout << "keystr " << keyStr << "newt " << newt << endl;
     op->hashtable[keyStr].push_back(*newt);
-
-//    for(auto it = op->hashtable.begin(); it != op->hashtable.end(); it++){
-//        cout << it->first << "=>" << it->second.size() << endl;
-//        for(int i = 0; i < it->second.size(); i++){
-//            vector<LeafValue> iv = it->second[i];
-//            for(int j=0; j < iv.size(); j++){
-//                cout << iv[j] << "\t";
-//            }
-//            cout << endl;
-//        }
-//    }
 }
 
 extern "C"
@@ -452,51 +466,45 @@ void joiner(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int3
     LeafValue *tup = (LeafValue*)tupPtr;
     LeafValue *key = (LeafValue*)keyPtr;
 
-//    cout << "Joiner called" << endl;
-//    for(int i=0; i<ac; i++) {
-//        cout << tup[i] << ", ";
-//    }
-//    cout << " || KEYS: ";
     string keyStr = "";
     for(int i=0; i<keySize; i++) {
-//        cout << key[i] << ", ";
         keyStr += to_string(key[i].l)+".";
     }
-//    cout << endl;
 
-    // TODO Iterate over hashtable and join, then push into schema.tuples
     for(auto i : op->hashtable[keyStr]) {
         vector<LeafValue> *joinedTuple = new vector<LeafValue>();
         joinedTuple->insert(joinedTuple->begin(), i.begin(), i.end());
         for(int j=0; j<ac; j++) {
             joinedTuple->push_back(tup[j]);
         }
-        for(int k = 0; k < joinedTuple->size(); k++){
-//            cout << (*joinedTuple)[k] << " ";
-        }
-//        cout << endl;
         op->getSchema()->addTuple(&((*joinedTuple)[0]));
     }
-
-
 }
 
 extern "C"
-uint64_t sizer(int64_t schemaaddr) {
+uint64_t schemaController(int64_t schemaaddr, SCHEMA_OP op) {
     Schema *schema = (Schema*)schemaaddr;
-//    cout << "\n\n\n=======================" << endl;
-//    for(auto i: schema->getTuples()) {
-//        for(int j=0; j<schema->getAttributes().size(); j++) {
-//            cout << *(i+j) << "|";
-//        }
-//        cout << endl;
-//    }
-//    cout << "\n\n\n=======================" << endl;
-    return schema->getTuples().size();
-}
-
-extern "C"
-uint64_t getpointer(int64_t schemaaddr) {
-    Schema *schema = (Schema*)schemaaddr;
-    return schema->getTuplePtr();
+    uint64_t k;
+    switch(op) {
+        case GET_PTR:
+            k = schema->getTuplePtr();
+//            cout << "GET_PTR: " << k << endl;
+            break;
+        case GET_SIZE:
+            k = schema->getTuples().size();
+//            cout << "GET_SIZE " << k << endl;
+            break;
+        case LD_BLK:
+            k = schema->loadBlock();
+//            cout << "LD_BLK: " << k << endl;
+            break;
+        case CLOSE:
+            k = schema->close();
+//            cout << "CLOSE: " << k << endl;
+            break;
+        default:
+            cout << "Unknown schema op in controller!" << endl;
+            exit(-1);
+    }
+    return k;
 }

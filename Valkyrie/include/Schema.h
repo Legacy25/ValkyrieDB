@@ -8,6 +8,8 @@
 #include "DataTypes.h"
 #include "Expression.h"
 
+#define VDB_BLOCK_SIZE 100000
+
 using namespace std;
 
 namespace valkyrie{
@@ -17,23 +19,28 @@ namespace valkyrie{
         string datafile;
         vector<string> attributes;
         vector<DataType> types;
+
         vector<LeafValue *> tuples;
-        bool materialized;
         unordered_map<string, valkyrie::Expression*> colMap;
+
         string formatAttrName(string name) const;
+        ifstream* infile;
+
     public:
         Schema(string tablename);
         Schema(string tablename, string datafile);
+
+        void init();
+        uint64_t loadBlock();
+        uint64_t close();
+
         void addAttribute(string, DataType);
         void addAttribute(string, DataType, Expression*);
         void addTuple(LeafValue *);
-        void materialize();
-        bool isMaterialized() const;
 
         // Getters, Setters
         void setTableName(string tablename);
         uint64_t getTuplePtr() const;
-        uint64_t getTuplePtr1() const;
         void setTuples(vector<LeafValue*> tuples);
         vector<LeafValue *> getTuples();
         size_t getTupleCount() const;

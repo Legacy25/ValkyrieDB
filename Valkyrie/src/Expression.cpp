@@ -178,7 +178,7 @@ Value* EqualExpression::getValue() {
             // TODO
             break;
         default:
-            cerr << "Unknown expression type!" << endl;
+            cout << "Unknown expression type!" << endl;
             exit(-1);
     }
 
@@ -207,7 +207,7 @@ Value* NotEqualExpression::getValue() {
             // TODO
             break;
         default:
-            cerr << "Unknown expression type!" << endl;
+            cout << "Unknown expression type!" << endl;
             exit(-1);
     }
 
@@ -236,7 +236,7 @@ Value* GreaterThanExpression::getValue() {
             // TODO
             break;
         default:
-            cerr << "Unknown expression type!" << endl;
+            cout << "Unknown expression type!" << endl;
             exit(-1);
     }
 
@@ -265,7 +265,7 @@ Value* GreaterThanEqualExpression::getValue() {
             // TODO
             break;
         default:
-            cerr << "Unknown expression type!" << endl;
+            cout << "Unknown expression type!" << endl;
             exit(-1);
     }
 
@@ -294,7 +294,7 @@ Value* LessThanExpression::getValue() {
             // TODO
             break;
         default:
-            cerr << "Unknown expression type!" << endl;
+            cout << "Unknown expression type!" << endl;
             exit(-1);
     }
 
@@ -323,7 +323,7 @@ Value* LessThanEqualExpression::getValue() {
             // TODO
             break;
         default:
-            cerr << "Unknown expression type!" << endl;
+            cout << "Unknown expression type!" << endl;
             exit(-1);
     }
 
