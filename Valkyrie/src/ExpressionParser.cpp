@@ -78,12 +78,31 @@ Expression* ExpressionParser::leafExpression(std::string s){
 
 Expression* ExpressionParser::parseExpression(std::string exp){
 	std::vector<std::string> tokens = splitString(exp, ' ');
+	for(int i = 0; i<tokens.size(); i++) {
+		BinaryExpression *op = NULL;
+		if(!tokens[i].compare("AND")) {
+			op = logicalExpression("AND");
+			string left = "", right ="";
+			for(int j=0; j < i; j++) {
+				left += tokens[j];
+				if(j != i-1) left += " ";
+			}
+			for(int j=i+1; j < tokens.size(); j++) {
+				right += tokens[j];
+				if(j != tokens.size()-1) right += " ";
+			}
+			op->setLeftExpression(parseExpression(left));
+			op->setRightExpression(parseExpression(right));
+			return op;
+		}
+	}
 	if(tokens.size() == 1)
 		return leafExpression(tokens[0]);
 	if(tokens.size() > 3 && tokens[tokens.size()-2] == "AS"){
 		std::size_t pos = exp.find(" AS ");
 		return parseExpression(exp.substr(0, pos));
 	}
+
 	for(int i = 0; i < tokens.size(); i++){
 		if(logicalOperators.find(tokens[i]) != logicalOperators.end() || 
 			arithmeticOperators.find(tokens[i]) != arithmeticOperators.end()){
