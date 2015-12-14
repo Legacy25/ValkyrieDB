@@ -25,41 +25,47 @@ namespace valkyrie{
 
         string formatAttrName(string name) const;
         ifstream* infile;
+        bool block_allocated = true;
 
     public:
+        // Constructors
         Schema(string tablename);
         Schema(string tablename, string datafile);
 
+        // LLVM Controller interface
         void init();
         uint64_t loadBlock();
         uint64_t close();
 
+        // Setup
         void addAttribute(string, DataType);
         void addAttribute(string, DataType, Expression*);
         void addTuple(LeafValue *);
 
         // Getters, Setters
         void setTableName(string tablename);
-        uint64_t getTuplePtr() const;
-        void setTuples(vector<LeafValue*> tuples);
-        vector<LeafValue *> getTuples();
-        size_t getTupleCount() const;
-        const vector<DataType> getTypes() const;
-        void setTypes(vector<DataType> types);
-        std::string getDataFile() const;
-        vector<string> getAttributes() const;
         string getTableName() const;
+
+        uint64_t getTuplePtr() const;
+        size_t getTupleCount() const;
+
+        void setTuples(vector<LeafValue*> ts);
+        vector<LeafValue *> getTuples();
+
+        const vector<DataType> getTypes() const;
+
+        std::string getDataFile() const;
+
+        vector<string> getAttributes() const;
         size_t getAttributePos(string) const;
         DataType getAttributeType(string) const;
         Expression* getAttrExpression(string colName);
         unordered_map<string, valkyrie::Expression*> getColumnMap();
-        void setColumnMap(unordered_map<string, valkyrie::Expression*> m);
-        std::string attrsVecsToCommaSepString(const vector<string>& attr, const vector<DataType>& types) const;
 
-
-        friend ostream& operator<<(ostream &stream, const valkyrie::Schema &schema);
 
         // Utilities
+        std::string attrsVecsToCommaSepString(const vector<string>& attr, const vector<DataType>& types) const;
+        friend ostream& operator<<(ostream &stream, const valkyrie::Schema &schema);
     };
 }
 

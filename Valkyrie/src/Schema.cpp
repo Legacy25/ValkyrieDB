@@ -65,15 +65,15 @@ void Schema::init() {
         cout << "Error, datafile invalid" << endl;
         exit(-1);
     }
+
+    tuples.reserve(VDB_BLOCK_SIZE);
 }
 
 uint64_t Schema::loadBlock() {
 
     assert(infile != NULL);
 
-    for(auto i : tuples) {
-        delete(i);
-    }
+    delete[] tuples[0];
     tuples.clear();
 
     assert(tuples.size() == 0);
@@ -81,32 +81,38 @@ uint64_t Schema::loadBlock() {
     string line;
     uint64_t k = 0;
 
-    while(getline(*infile, line)) {
-        unsigned long n = attributes.size();
-        LeafValue *tuple = new LeafValue[n];
-        stringstream linestream;
-        linestream.str(line);
-        string str;
+    unsigned long n = attributes.size();
+    LeafValue *theap = new LeafValue[VDB_BLOCK_SIZE * n];
 
-        int i=0;
-        while(getline(linestream, str, '|')) {
+    while(getline(*infile, line)) {
+        const char *l = line.c_str();
+        size_t lineptr = 0;
+
+        for(int i=0; i<n; i++) {
+            size_t startlineptr = lineptr;
+            while(*(l+lineptr) != '|') {
+                lineptr++;
+            }
+            string str = line.substr(startlineptr, lineptr-startlineptr);
             switch(types.at(i)) {
                 case LONG:
-                    tuple[i].l = stol(str);
+                    theap[k*n+i].l = stol(str);
+//                    theap[k*n+i].l = strtol(str.c_str(), NULL, 10);
                     break;
                 case DOUBLE:
-                    tuple[i].d = stod(str);
+//                    theap[k*n+i].d = stod(str);
+                    theap[k*n+i].d = strtod(str.c_str(), NULL);
                     break;
                 case STRING:
                 case DATE:
                     unsigned long buf_size = str.size()+1;
-                    tuple[i].c = new char[buf_size];
-                    memcpy(tuple[i].c, str.c_str(), buf_size);
+                    theap[k*n+i].c = new char[buf_size];
+                    memcpy(theap[k*n+i].c, str.c_str(), buf_size);
                     break;
             }
-            i++;
+            lineptr++;
         }
-        tuples.push_back(tuple);
+        tuples.push_back(&theap[k*n]);
         k++;
         if(k >= VDB_BLOCK_SIZE) break;
     }
@@ -122,8 +128,12 @@ uint64_t Schema::close() {
     }
 
     if(tuples.size() > 0) {
-        for(auto i : tuples) {
-            delete(i);
+        if(block_allocated) {
+            delete[] tuples[0];
+        } else {
+            for(auto i : tuples) {
+                delete(i);
+            }
         }
         tuples.clear();
     }
@@ -162,10 +172,6 @@ vector<LeafValue *> Schema::getTuples() {
 
 uint64_t Schema::getTuplePtr() const {
     return (uint64_t) &tuples[0];
-}
-
-void Schema::setTypes(vector<DataType> types) {
-    this->types = types;
 }
 
 const vector<DataType> Schema::getTypes() const{
@@ -219,10 +225,6 @@ std::unordered_map<std::string, valkyrie::Expression*> Schema::getColumnMap(){
     return this->colMap;
 };
 
-void Schema::setColumnMap(unordered_map<string, valkyrie::Expression *> m) {
-    this->colMap = m;
-}
-
 Expression *Schema::getAttrExpression(string attr) {
     string colName = formatAttrName(attr);
     if(colMap.find(colName) == colMap.end())
@@ -231,6 +233,7 @@ Expression *Schema::getAttrExpression(string attr) {
 }
 
 void Schema::addTuple(LeafValue *lv) {
+    block_allocated = false;
     tuples.push_back(lv);
 }
 
