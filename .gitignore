@@ -1,4 +1,14 @@
 /bin/
 MushroomCloud/bin/
 Valkyrie/build/
+
 .idea/
+
+perf.data
+perf.data.old
+
+*.tbl
+*.out
+
+test/tpch.db
+test/tpch-dbgen

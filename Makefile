@@ -22,7 +22,7 @@ mushroomcloud:
 	cp -a MushroomCloud/lib/. ./bin/
 
 valkyrie:
-	$(CC) $(SRC_DIR)/*.cpp $(CFLAGS) -o bin/llvmruntime -I$(INC_DIR) -I/usr/include/boost/unordered_map -L/usr/lib/x86_64-linux-gnu
+	$(CC) $(SRC_DIR)/*.cpp $(CFLAGS) -o bin/llvmruntime -I$(INC_DIR)
 
 clean:
 	rm -r MushroomCloud/bin

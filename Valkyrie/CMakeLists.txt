@@ -14,7 +14,6 @@ file(GLOB VALKYRIE_INC "include/*.h")
 file(GLOB VALKYRIE_SRC "src/*.cpp")
 
 include_directories(PRIVATE include PRIVATE ${LLVM_LIBS})
-include_directories(/usr/include/boost/unordered_map)
 
 set(SOURCE_FILES ${VALKYRIE_INC} ${VALKYRIE_SRC})
 add_executable(VALKYRIE ${SOURCE_FILES})

@@ -7,7 +7,6 @@
 
 #include "Operator.h"
 #include "Expression.h"
-#include <boost/unordered_map.hpp>
 
 namespace valkyrie {
     class JoinOperator : public Operator {
@@ -21,7 +20,7 @@ namespace valkyrie {
                 , string ltable, string rtable);
         Schema* mergeSchemas(Schema* lsch, Schema* rsch);
     public:
-        boost::unordered_map<string, vector<vector<LeafValue>>> hashtable;
+        unordered_map<string, vector<vector<LeafValue>>> hashtable;
         JoinOperator(std::vector<std::string> expressions, std::vector<Operator*> children);
         void produce();
         void consume();
