@@ -45,6 +45,8 @@ namespace codegen {
     void setSchema(Schema *schema);
     Schema* getSchema();
 
+    Value* stringCmp(Value*, Value*, ExprType);
+
     void nollvm();
 }
 

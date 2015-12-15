@@ -113,70 +113,8 @@ Value* EqualExpression::getValue() {
         case DOUBLEVALUEEXPRESSION:
             return builder->CreateFCmpOEQ(leftExpression->getValue(), rightExpression->getValue());
         case STRINGVALUEEXPRESSION:
-
-            // Use StringRef's compare()
-            // (or)
-            // iterate through the characters in the String for comparision
-            //------------------------------------------------------------------------
-            /*static uint32_t nameCounter = 0;
-
-            FunctionType *loopFunctionType = FunctionType::get(int32Type, false);
-            Function *loopFunction = Function::Create(loopFunctionType, Function::ExternalLinkage, "StringCheckStart", module);
-
-            BasicBlock *entry = BasicBlock::Create(context, "entry", loopFunction);
-            builder->SetInsertPoint(entry);
-
-
-            Value *loopIndex = builder->CreateAlloca(int32Type, ConstantInt::get(int32Type, 1), "loopVar" + to_string(nameCounter++));
-            builder->CreateStore(ConstantInt::get(int32Type, 0), loopIndex);
-
-            BasicBlock *startLoopBody = BasicBlock::Create(context, "startLoopBody" + to_string(nameCounter++), loopFunction);
-            builder->CreateBr(startLoopBody);
-            builder->SetInsertPoint(startLoopBody);
-
-            Value *i = builder->CreateLoad(loopIndex);
-
-            Value *indices[1];
-            indices[0] = i;
-            ArrayRef<Value *> indicesRef(indices);*/
-
-            //TODO
-            //Value *charString1 = builder->CreateLoad(   /* Load each character of the String 1 */   );
-            //Value *charString2 = builder->CreateLoad(   /* Load each character of the String 2 */   );
-
-            //Value *increment = builder->CreateAdd(i, ConstantInt::get(int32Type, 1));
-            //builder->CreateStore(increment, loopIndex);
-
-            // Comapare both characters and use this as an exit condition of the loop
-            // Or Run the loop until the length of small String
-            //TODO
-            //Value *cmp = builder->CreateICmpSLT(increment, /* min of lenString1 and lenString2 */);
-
-            /*BasicBlock *endLoopBody = BasicBlock::Create(context, "endLoopBody"+to_string(nameCounter++), loopFunction);
-            builder->CreateCondBr(cmp, startLoopBody, endLoopBody);
-            builder->SetInsertPoint(endLoopBody);*/
-
-            //------------------------------------------------------------------------
-
-
-            /* BackUp - Code to use an if condition within the loop
-
-            // if both characters not equal return false
-            // false block which returns FALSE
-            BasicBlock *startFalseBlock = BasicBlock::Create(context, "If"+to_string(nameCtr++), loopFunction);
-            builder->CreateBr(startFalseBlock);
-            builder->SetInsertPoint(startFalseBlock);
-
-            //Compare characters
-
-            BasicBlock *endFalseBlock = BasicBlock::Create(context, "endLoopBody"+to_string(nameCounter++), loopFunction);
-            builder->CreateCondBr(cmp, startFalseBlock, endFalseBlock);
-            builder->SetInsertPoint(endLoopBody);
-            */
-
         case DATEVALUEEXPRESSION:
-            // TODO
-            break;
+            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), EQUALEXPRESSION);
         default:
             cout << "Unknown expression type!" << endl;
             exit(-1);
@@ -204,8 +142,7 @@ Value* NotEqualExpression::getValue() {
             return builder->CreateFCmpONE(leftExpression->getValue(), rightExpression->getValue());
         case STRINGVALUEEXPRESSION:
         case DATEVALUEEXPRESSION:
-            // TODO
-            break;
+            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), EQUALEXPRESSION);
         default:
             cout << "Unknown expression type!" << endl;
             exit(-1);
@@ -233,8 +170,7 @@ Value* GreaterThanExpression::getValue() {
             return builder->CreateFCmpOGT(leftExpression->getValue(), rightExpression->getValue());
         case STRINGVALUEEXPRESSION:
         case DATEVALUEEXPRESSION:
-            // TODO
-            break;
+            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), EQUALEXPRESSION);
         default:
             cout << "Unknown expression type!" << endl;
             exit(-1);
@@ -262,8 +198,7 @@ Value* GreaterThanEqualExpression::getValue() {
             return builder->CreateFCmpOGE(leftExpression->getValue(), rightExpression->getValue());
         case STRINGVALUEEXPRESSION:
         case DATEVALUEEXPRESSION:
-            // TODO
-            break;
+            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), EQUALEXPRESSION);
         default:
             cout << "Unknown expression type!" << endl;
             exit(-1);
@@ -291,8 +226,7 @@ Value* LessThanExpression::getValue() {
             return builder->CreateFCmpOLT(leftExpression->getValue(), rightExpression->getValue());
         case STRINGVALUEEXPRESSION:
         case DATEVALUEEXPRESSION:
-            // TODO
-            break;
+            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), EQUALEXPRESSION);
         default:
             cout << "Unknown expression type!" << endl;
             exit(-1);
@@ -320,8 +254,7 @@ Value* LessThanEqualExpression::getValue() {
             return builder->CreateFCmpOLE(leftExpression->getValue(), rightExpression->getValue());
         case STRINGVALUEEXPRESSION:
         case DATEVALUEEXPRESSION:
-            // TODO
-            break;
+            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), EQUALEXPRESSION);
         default:
             cout << "Unknown expression type!" << endl;
             exit(-1);
@@ -353,13 +286,13 @@ StringValueExpression::StringValueExpression(std::string* data){
 }
 
 Value* StringValueExpression::getValue() {
-    // TODO
-    return NULL;
+    Type* int64Ty = Type::getInt64Ty(getGlobalContext());
+    return ConstantInt::get(int64Ty, (uint64_t) data, true);
 }
 
 Value* DateValueExpression::getValue() {
-    // TODO
-    return NULL;
+    Type* int64Ty = Type::getInt64Ty(getGlobalContext());
+    return ConstantInt::get(int64Ty, (uint64_t) data, true);
 }
 
 ColExpression::ColExpression(std::string name){

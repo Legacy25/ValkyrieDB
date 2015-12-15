@@ -24,7 +24,11 @@ static Module *module;
 static IRBuilder<> *builder;
 
 /* Declaration of llvm functions */
-static Function *mainFunction, *hashFunction, *joinFunction, *schControlFunction;
+static Function *mainFunction,
+        *hashFunction,
+        *joinFunction,
+        *schControlFunction,
+        *strCompFunction;
 static Constant *printfFunc;
 
 /* Useful codegen variables */
@@ -128,6 +132,19 @@ void codegen::initialize(string ModuleName) {
             schControlFunctionType,
             Function::ExternalLinkage,
             "schemaController",
+            module
+    );
+
+    // The string compare function
+    FunctionType *strCompFunctionType = FunctionType::get(
+            Type::getInt32Ty(context),
+            ArrayRef<Type *>({int64Type, int64Type, int32Type}),
+            false
+    );
+    strCompFunction = Function::Create(
+            strCompFunctionType,
+            Function::ExternalLinkage,
+            "strComparer",
             module
     );
 
@@ -449,6 +466,15 @@ Schema* codegen::getSchema(){
     return gschema;
 }
 
+Value* codegen::stringCmp(Value* left, Value* right, ExprType et) {
+    Value* args[3];
+    args[0] = left;
+    args[1] = right;
+    args[2] = ConstantInt::get(int32Type, EQUALEXPRESSION);
+    ArrayRef<Value*> argsRef(args);
+    return builder->CreateICmpEQ(builder->CreateCall(strCompFunction, argsRef), ConstantInt::get(int32Type, 1));
+}
+
 extern "C"
 void hasher(int64_t opPtr, int64_t keyPtr, int32_t keySize, int64_t tupPtr, int32_t ac) {
     JoinOperator *op = (JoinOperator*)opPtr;
@@ -514,4 +540,12 @@ uint64_t schemaController(int64_t schemaaddr, SCHEMA_OP op) {
             exit(-1);
     }
     return k;
+}
+
+extern "C"
+int32_t strComparer(uint64_t lsPtr, uint64_t rsPtr, ExprType et) {
+    switch(et) {
+        case EQUALEXPRESSION:
+            if(strcmp(toupper(lsPtr), toupper(rsPtr)))
+    }
 }
