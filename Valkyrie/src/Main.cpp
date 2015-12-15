@@ -12,8 +12,11 @@ using namespace std;
  * This will take as input, the query plan from Java land,
  * and output the llvm code.
  */
-int main()
+int main(int argc, char** argv)
 {
+    if(argc == 2 && strcmp(*argv, "-nollvm")) {
+        codegen::nollvm();
+    }
 	//Parsing
 	string json;
 	getline(cin, json);

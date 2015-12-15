@@ -44,6 +44,8 @@ namespace codegen {
     void joinRightConsume(JoinOperator*);
     void setSchema(Schema *schema);
     Schema* getSchema();
+
+    void nollvm();
 }
 
 #endif //CDB_CODEGEN_H

@@ -54,6 +54,12 @@ static Value* tuplePtr;
 static Value* tc;
 static Value* ac;
 
+static bool llvmoutput = true;
+
+void codegen::nollvm() {
+    llvmoutput = false;
+}
+
 /* Initialize codegen, sets everything up */
 void codegen::initialize(string ModuleName) {
     if(initialized) {
@@ -147,7 +153,8 @@ ExecutionEngine* codegen::compile() {
     builder->CreateRet(ConstantInt::get(int32Type, 0));
 
     // This is for debugging
-    module->dump();
+    if(llvmoutput)
+        module->dump();
 
     string error;
     ExecutionEngine *executionEngine = EngineBuilder(module).
