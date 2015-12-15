@@ -85,6 +85,8 @@ public class Main {
 	 * or executes the query
 	 */
 	public static boolean EXECUTE = false;
+
+	public static boolean PUSH_DOWN_PROJECTIONS = false;
 	
 	public static void main(String[] args) {
 		
@@ -112,6 +114,9 @@ public class Main {
 			}
 			else if(args[i].equalsIgnoreCase("--exec")) {
 				EXECUTE = true;
+			}
+			else if(args[i].equalsIgnoreCase("--pdp")) {
+				PUSH_DOWN_PROJECTIONS = true;
 			}
 			else if(args[i].equalsIgnoreCase("--swap")) {
 				SWAP = new File(args[i+1]);

@@ -71,8 +71,9 @@ public class ParseTreeOptimizer {
 		parseTree = reOrderJoins(parseTree);
 		
 		/* Push down projections */
-		// if(!(parseTree instanceof ScanOperator))
-		// 	parseTree = pushDownProjections(parseTree);
+		if(!(parseTree instanceof ScanOperator))
+			if(Main.PUSH_DOWN_PROJECTIONS)
+				parseTree = pushDownProjections(parseTree);
 		
 		/* Decompose Select Clauses and push them down appropriately */
 		parseTree = initialSelectionDecomposition(parseTree);
