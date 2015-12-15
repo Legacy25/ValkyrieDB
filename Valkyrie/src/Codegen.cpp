@@ -546,6 +546,11 @@ extern "C"
 int32_t strComparer(uint64_t lsPtr, uint64_t rsPtr, ExprType et) {
     switch(et) {
         case EQUALEXPRESSION:
-            if(strcmp(toupper(lsPtr), toupper(rsPtr)))
+            if (strcasecmp(((string*)lsPtr)->c_str(), ((string*)rsPtr)->c_str()) == 0) return 1; else return 0;
+        case NOTEQUALEXPRESSION:
+            if (strcasecmp(((string*)lsPtr)->c_str(), ((string*)rsPtr)->c_str()) != 0) return 1; else return 0;
+        default:
+            cout << "Unknown schema op in controller!" << endl;
+            exit(-1);
     }
 }
