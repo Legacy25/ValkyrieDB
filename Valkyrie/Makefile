@@ -17,7 +17,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 valkyrie: 
 	mkdir -p build
-	$(CC) $(SRC_DIR)/*.cpp $(CFLAGS) -o build/llvmruntime -I$(INC_DIR)
+	$(CC) $(SRC_DIR)/*.cpp $(CFLAGS) -o build/llvmruntime -I$(INC_DIR) -I/usr/include/boost/unordered_map -L/usr/lib/x86_64-linux-gnu
 
 clean:
 	rm -f $(OBJ_DIR)/*.o $(INC_DIR)/*~ valkyrie

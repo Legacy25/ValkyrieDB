@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import sys
 import shutil
 import subprocess
 import glob
@@ -9,7 +10,7 @@ import sqlite3
 home = os.path.dirname(os.path.realpath(__file__))
 tpchgenrepo = "git@github.com:Legacy25/tpch-dbgen.git"
 tpchdb = "tpch.db"
-sf = "1"
+sf = sys.argv[1]
 
 def clonerepo(repo):
 	os.chdir(home)
@@ -18,6 +19,7 @@ def clonerepo(repo):
 	subprocess.call(["git", "clone", repo])
 
 def initdatafolder():
+	os.chdir(home)
 	if(os.path.exists("data")):
 		shutil.rmtree("data")
 	os.mkdir("data")
