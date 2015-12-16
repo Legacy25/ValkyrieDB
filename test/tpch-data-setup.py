@@ -8,7 +8,7 @@ import glob
 import sqlite3
 
 home = os.path.dirname(os.path.realpath(__file__))
-tpchgenrepo = "git@github.com:Legacy25/tpch-dbgen.git"
+tpchgenrepo = "https://github.com/Legacy25/tpch-dbgen.git"
 tpchdb = "tpch.db"
 sf = sys.argv[1]
 
