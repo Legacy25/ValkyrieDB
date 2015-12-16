@@ -38,5 +38,9 @@ Operator* Parser::createTree(const rapidjson::Value& node){
 	} else if(type == "JOIN"){
 		op = new JoinOperator(expressions, children);
 	}
+	if(op == NULL){
+		std::cout << type << " Operator not implemented" << std::endl;
+		exit(-1);
+	}
 	return op;
 }
