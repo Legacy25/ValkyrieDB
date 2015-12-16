@@ -10,7 +10,7 @@
 namespace valkyrie{
 	class ExpressionParser {
 	private:
-		std::unordered_set<std::string> logicalOperators, arithmeticOperators;
+		std::unordered_set<std::string> logicalOperators, arithmeticOperators, relationalOperators;
 		std::vector<std::string> splitString(const std::string s, char delimiter);
 		bool isDouble(std::string s);
 		bool isLong(std::string s);
@@ -19,8 +19,7 @@ namespace valkyrie{
 		long extractLong(std::string s);
 		double extractDouble(std::string s);
 		valkyrie::Expression* leafExpression(std::string s);
-		valkyrie::BinaryExpression* logicalExpression(std::string s);
-		valkyrie::BinaryExpression* arithmeticExpression(std::string s);
+		valkyrie::BinaryExpression* binaryExpression(std::string s);
 		valkyrie::Expression* parseExpression(std::vector<std::string> s);
 	public:
 		ExpressionParser();

@@ -17,17 +17,17 @@ ExpressionParser::ExpressionParser(){
 	arithmeticOperators.insert("-");
 	arithmeticOperators.insert("*");
 	arithmeticOperators.insert("/");
-	logicalOperators.insert("=");
-	logicalOperators.insert("<>");
-	logicalOperators.insert(">");
-	logicalOperators.insert(">=");
-	logicalOperators.insert("<");
-	logicalOperators.insert("<=");
+	relationalOperators.insert("=");
+	relationalOperators.insert("<>");
+	relationalOperators.insert(">");
+	relationalOperators.insert(">=");
+	relationalOperators.insert("<");
+	relationalOperators.insert("<=");
 	logicalOperators.insert("AND");
 	logicalOperators.insert("OR");
 }
 
-BinaryExpression* ExpressionParser::logicalExpression(std::string s){
+BinaryExpression* ExpressionParser::binaryExpression(std::string s){
 	if(s == "=")
 		return new EqualExpression();
 	if(s == "<>")
@@ -44,18 +44,16 @@ BinaryExpression* ExpressionParser::logicalExpression(std::string s){
 		return new AndExpression();
 	if(s == "OR")
 		return new OrExpression();
-	raise_exception();
-	return NULL;
-}
-
-BinaryExpression* ExpressionParser::arithmeticExpression(std::string s){
 	if(s == "+")
 		return new AdditionExpression();
 	if(s == "-")
 		return new SubtractionExpression();
 	if(s == "*")
 		return new MultiplicationExpression();
-	return new DivisionExpression();
+	if(s == "/")
+		return new DivisionExpression();
+	raise_exception();
+	return NULL;
 }
 
 Expression* ExpressionParser::leafExpression(std::string s){
@@ -87,7 +85,18 @@ Expression* ExpressionParser::parseExpression(std::vector<std::string> tokens){
 			Expression *left = parseExpression(std::vector<std::string>(tokens.begin(), tokens.begin()+i));
 			Expression *right = parseExpression(std::vector<std::string>(tokens.begin()+i+1, tokens.end()));
 			BinaryExpression *op = NULL;
-			op = logicalExpression(tokens[i]);
+			op = binaryExpression(tokens[i]);
+			op->setLeftExpression(left);
+			op->setRightExpression(right);
+			return op;
+		}
+	}
+	for(int i = 0; i < tokens.size(); i++){
+		if(relationalOperators.find(tokens[i]) != relationalOperators.end()){
+			Expression *left = parseExpression(std::vector<std::string>(tokens.begin(), tokens.begin()+i));
+			Expression *right = parseExpression(std::vector<std::string>(tokens.begin()+i+1, tokens.end()));
+			BinaryExpression *op = NULL;
+			op = binaryExpression(tokens[i]);
 			op->setLeftExpression(left);
 			op->setRightExpression(right);
 			return op;
@@ -98,7 +107,7 @@ Expression* ExpressionParser::parseExpression(std::vector<std::string> tokens){
 			Expression *left = parseExpression(std::vector<std::string>(tokens.begin(), tokens.begin()+i));
 			Expression *right = parseExpression(std::vector<std::string>(tokens.begin()+i+1, tokens.end()));
 			BinaryExpression *op = NULL;
-			op = arithmeticExpression(tokens[i]);
+			op = binaryExpression(tokens[i]);
 			op->setLeftExpression(left);
 			op->setRightExpression(right);
 			return op;
