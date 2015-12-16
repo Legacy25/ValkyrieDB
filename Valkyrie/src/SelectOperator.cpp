@@ -15,6 +15,7 @@ SelectOperator::SelectOperator(std::vector<std::string> expressions, std::vector
 
 void SelectOperator::updateExpression(Expression *newExp, unordered_map<std::string, Expression *> m, std::string tableName) {
     ExprType t = newExp->getType();
+    cout << newExp->toString() << " | " << t << endl;
     if (t != ExprType::COLEXPRESSION && t != ExprType::DOUBLEVALUEEXPRESSION && t != ExprType::STRINGVALUEEXPRESSION &&
         t != ExprType::LONGVALUEEXPRESSION && t != ExprType::DATEVALUEEXPRESSION) {
         BinaryExpression *b = (BinaryExpression *) newExp;

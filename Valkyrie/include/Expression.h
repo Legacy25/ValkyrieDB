@@ -232,25 +232,24 @@ namespace valkyrie{
 
     class StringValueExpression: public PrimitiveValue {
     private:
-        string* data;
+        char* data;
 
     public:
-        StringValueExpression(string* data);
-        string* getData();
-        void setData(string*);
+        StringValueExpression(char* data);
         Value* getValue();
-        string toString(){return *data;}
+        ExprType getType(){ return ExprType::STRINGVALUEEXPRESSION; }
+        string toString(){return string(data);}
     };
 
     class DateValueExpression: public PrimitiveValue {
     private:
-        string* data;
+        char* data;
 
     public:
-        string* getData();
-        void setData(string*);
+        DateValueExpression(char* data);
         Value* getValue();
-        string toString(){return *data;}
+        ExprType getType(){ return ExprType::DATEVALUEEXPRESSION; }
+        string toString(){return string(data);}
     };
 
     // This represents a column

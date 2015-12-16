@@ -142,7 +142,7 @@ Value* NotEqualExpression::getValue() {
             return builder->CreateFCmpONE(leftExpression->getValue(), rightExpression->getValue());
         case STRINGVALUEEXPRESSION:
         case DATEVALUEEXPRESSION:
-            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), EQUALEXPRESSION);
+            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), NOTEQUALEXPRESSION);
         default:
             cout << "Unknown expression type!" << endl;
             exit(-1);
@@ -170,7 +170,7 @@ Value* GreaterThanExpression::getValue() {
             return builder->CreateFCmpOGT(leftExpression->getValue(), rightExpression->getValue());
         case STRINGVALUEEXPRESSION:
         case DATEVALUEEXPRESSION:
-            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), EQUALEXPRESSION);
+            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), GREATERTHANEXPRESSION);
         default:
             cout << "Unknown expression type!" << endl;
             exit(-1);
@@ -198,7 +198,7 @@ Value* GreaterThanEqualExpression::getValue() {
             return builder->CreateFCmpOGE(leftExpression->getValue(), rightExpression->getValue());
         case STRINGVALUEEXPRESSION:
         case DATEVALUEEXPRESSION:
-            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), EQUALEXPRESSION);
+            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), GREATERTHANEQUALEXPRESSION);
         default:
             cout << "Unknown expression type!" << endl;
             exit(-1);
@@ -226,7 +226,7 @@ Value* LessThanExpression::getValue() {
             return builder->CreateFCmpOLT(leftExpression->getValue(), rightExpression->getValue());
         case STRINGVALUEEXPRESSION:
         case DATEVALUEEXPRESSION:
-            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), EQUALEXPRESSION);
+            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), LESSTHANEXPRESSION);
         default:
             cout << "Unknown expression type!" << endl;
             exit(-1);
@@ -254,7 +254,7 @@ Value* LessThanEqualExpression::getValue() {
             return builder->CreateFCmpOLE(leftExpression->getValue(), rightExpression->getValue());
         case STRINGVALUEEXPRESSION:
         case DATEVALUEEXPRESSION:
-            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), EQUALEXPRESSION);
+            return codegen::stringCmp(leftExpression->getValue(), rightExpression->getValue(), LESSTHANEQUALEXPRESSION);
         default:
             cout << "Unknown expression type!" << endl;
             exit(-1);
@@ -281,7 +281,7 @@ Value* DoubleValueExpression::getValue() {
     return ConstantFP::get(doubleTy, data);
 }
 
-StringValueExpression::StringValueExpression(std::string* data){
+StringValueExpression::StringValueExpression(char* data){
     this->data = data;
 }
 
