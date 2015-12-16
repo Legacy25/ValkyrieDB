@@ -36,21 +36,6 @@ ORDER BY revenue desc, orders.orderdate;*/
 --   and lineitem.orderkey = orders.orderkey
 --   and orders.totalprice > 460000.0;
 
-SELECT  
-        customer.custkey, 
-        customer.name, 
-        customer.acctbal,
-        nation.name,
-        customer.address,
-        customer.phone,
-        customer.comment,
-        lineitem.extendedprice, lineitem.discount
-FROM    
-        customer, 
-        orders,
-        lineitem,
-        nation
-WHERE   
-        customer.custkey = orders.custkey
-        AND   lineitem.orderkey = orders.orderkey
-        AND   customer.nationkey = nation.nationkey;
+SELECT returnflag, linestatus, shipdate
+FROM lineitem
+WHERE shipdate <= "1997-09-01";

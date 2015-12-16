@@ -8,12 +8,18 @@ SELECT
         customer.comment,
         lineitem.extendedprice, lineitem.discount
 FROM    
-        customer, 
+        customer,
         orders,
         lineitem,
-        nation
+        supplier,
+        nation, 
+        region
 WHERE   
         customer.custkey = orders.custkey
         AND   lineitem.orderkey = orders.orderkey
-        AND   customer.nationkey = nation.nationkey
-        AND   lineitem.extendedprice > 100000.0;
+        AND   customer.nationkey = supplier.nationkey
+        AND   supplier.nationkey = nation.nationkey 
+        AND   nation.regionkey = region.regionkey 
+        AND   region.name = 'ASIA'
+        AND   orders.orderdate >= '1994-01-01'
+        AND   orders.orderdate <  '1995-01-01';

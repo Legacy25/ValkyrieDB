@@ -62,7 +62,7 @@ Expression* ExpressionParser::leafExpression(std::string s){
 	if(s == "*"){
 		//TODO check this, replace for all columns
 		return new ColExpression(s);
-	}else if(s[0] == '\"' && s[s.length()-1] == '\"'){
+	}else if(s[0] == '\'' && s[s.length()-1] == '\''){
 		char *ss = new char[s.length()-2];
 		memcpy(ss, s.substr(1, s.length() - 2).c_str(), s.length()-2);
 		return new StringValueExpression(ss);
@@ -168,7 +168,7 @@ bool ExpressionParser::isDate(std::string s){
 }
 
 bool ExpressionParser::isString(std::string s){
-	return s[0] == '\"' && s[s.length()-1] == '\"';
+	return s[0] == '\'' && s[s.length()-1] == '\'';
 }
 
 long ExpressionParser::extractLong(std::string s){
