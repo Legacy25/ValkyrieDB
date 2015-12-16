@@ -36,21 +36,23 @@ ORDER BY revenue desc, orders.orderdate;*/
 --   and lineitem.orderkey = orders.orderkey
 --   and orders.totalprice > 460000.0;
 
-SELECT  
-        customer.custkey, 
-        customer.name, 
-        customer.acctbal,
+--select * from customer where name = 'Customer#000000016';
+
+SELECT
         nation.name,
-        customer.address,
-        customer.phone,
-        customer.comment,
-        lineitem.extendedprice, lineitem.discount
-FROM    
-        customer, 
+        lineitem.extendedprice,
+        lineitem.discount
+FROM
         orders,
         lineitem,
-        nation
-WHERE   
-        customer.custkey = orders.custkey
-        AND   lineitem.orderkey = orders.orderkey
-        AND   customer.nationkey = nation.nationkey;
+        supplier,
+        nation,
+        region
+WHERE
+        lineitem.orderkey = orders.orderkey
+        AND   supplier.nationkey = nation.nationkey
+        AND   nation.regionkey = region.regionkey
+        AND   region.name = 'ASIA'
+        AND   orders.orderdate >= '1994-01-01'
+        AND   orders.orderdate <  '1995-01-01'
+        AND   lineitem.suppkey = supplier.suppkey;

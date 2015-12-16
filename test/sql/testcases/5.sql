@@ -1,19 +1,18 @@
-SELECT  
-        customer.custkey, 
-        customer.name, 
-        customer.acctbal,
+SELECT
         nation.name,
-        customer.address,
-        customer.phone,
-        customer.comment,
-        lineitem.extendedprice, lineitem.discount
-FROM    
-        customer, 
+        lineitem.extendedprice,
+        lineitem.discount
+FROM
         orders,
         lineitem,
-        nation
-WHERE   
-        customer.custkey = orders.custkey
-        AND   lineitem.orderkey = orders.orderkey
-        AND   customer.nationkey = nation.nationkey
-        AND   lineitem.extendedprice > 100000.0;
+        supplier,
+        nation,
+        region
+WHERE
+        lineitem.orderkey = orders.orderkey
+        AND   supplier.nationkey = nation.nationkey
+        AND   nation.regionkey = region.regionkey
+        AND   region.name = 'ASIA'
+        AND   orders.orderdate >= '1994-01-01'
+        AND   orders.orderdate <  '1995-01-01'
+        AND   lineitem.suppkey = supplier.suppkey;

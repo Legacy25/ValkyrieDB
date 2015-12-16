@@ -59,9 +59,19 @@ BinaryExpression* ExpressionParser::arithmeticExpression(std::string s){
 }
 
 Expression* ExpressionParser::leafExpression(std::string s){
+<<<<<<< HEAD
 	if(s[0] == '\'' && s[s.length()-1] == '\''){
 		string* ns = new string(s.begin()+1, s.end()-1);
 		return new StringValueExpression(ns);
+=======
+	if(s == "*"){
+		//TODO check this, replace for all columns
+		return new ColExpression(s);
+	}else if(s[0] == '\'' && s[s.length()-1] == '\''){
+		char *ss = new char[s.length()-2];
+		memcpy(ss, s.substr(1, s.length() - 2).c_str(), s.length()-2);
+		return new StringValueExpression(ss);
+>>>>>>> origin
 		//add starts with date
 		//string expression
 	}else if(isLong(s)){

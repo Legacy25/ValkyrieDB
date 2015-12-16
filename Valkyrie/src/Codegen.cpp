@@ -470,7 +470,7 @@ Value* codegen::stringCmp(Value* left, Value* right, ExprType et) {
     Value* args[3];
     args[0] = left;
     args[1] = right;
-    args[2] = ConstantInt::get(int32Type, EQUALEXPRESSION);
+    args[2] = ConstantInt::get(int32Type, et);
     ArrayRef<Value*> argsRef(args);
     return builder->CreateICmpEQ(builder->CreateCall(strCompFunction, argsRef), ConstantInt::get(int32Type, 1));
 }
@@ -543,12 +543,20 @@ uint64_t schemaController(int64_t schemaaddr, SCHEMA_OP op) {
 }
 
 extern "C"
-int32_t strComparer(uint64_t lsPtr, uint64_t rsPtr, ExprType et) {
+int32_t strComparer(char* lsPtr, char* rsPtr, ExprType et) {
     switch(et) {
         case EQUALEXPRESSION:
-            if (strcasecmp(((string*)lsPtr)->c_str(), ((string*)rsPtr)->c_str()) == 0) return 1; else return 0;
+            if (strcasecmp(lsPtr, rsPtr) == 0) return 1; else return 0;
         case NOTEQUALEXPRESSION:
-            if (strcasecmp(((string*)lsPtr)->c_str(), ((string*)rsPtr)->c_str()) != 0) return 1; else return 0;
+            if (strcasecmp(lsPtr, rsPtr) != 0) return 1; else return 0;
+        case GREATERTHANEQUALEXPRESSION:
+            if (strcasecmp(lsPtr, rsPtr) >= 0) return 1; else return 0;
+        case GREATERTHANEXPRESSION:
+            if (strcasecmp(lsPtr, rsPtr) > 0) return 1; else return 0;
+        case LESSTHANEQUALEXPRESSION:
+            if (strcasecmp(lsPtr, rsPtr) <= 0) return 1; else return 0;
+        case LESSTHANEXPRESSION:
+            if (strcasecmp(lsPtr, rsPtr) < 0) return 1; else return 0;
         default:
             cout << "Unknown schema op in controller!" << endl;
             exit(-1);
