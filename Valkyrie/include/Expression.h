@@ -243,13 +243,13 @@ namespace valkyrie{
 
     class StringValueExpression: public PrimitiveValue {
     private:
-        string* data;
+        char* data;
 
     public:
-        StringValueExpression(string* data);
+        StringValueExpression(char* data);
         Value* getValue();
         ExprType getType(){ return ExprType::STRINGVALUEEXPRESSION; }
-        string toString(){return *data;}
+        string toString(){return string(data);}
     };
 
     class DateValueExpression: public PrimitiveValue {

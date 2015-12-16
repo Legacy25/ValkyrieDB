@@ -38,21 +38,11 @@ ORDER BY revenue desc, orders.orderdate;*/
 
 --select * from customer where name = 'Customer#000000016';
 
-SELECT
-        nation.name,
-        lineitem.extendedprice,
-        lineitem.discount
-FROM
-        orders,
-        lineitem,
-        supplier,
-        nation,
-        region
+SELECT orders.orderkey, orders.totalprice, lineitem.extendedprice, lineitem.discount, lineitem.quantity, customer.name
+FROM customer, orders, lineitem
 WHERE
-        lineitem.orderkey = orders.orderkey
-        AND   supplier.nationkey = nation.nationkey
-        AND   nation.regionkey = region.regionkey
-        AND   region.name = 'ASIA'
-        AND   orders.orderdate >= '1994-01-01'
-        AND   orders.orderdate <  '1995-01-01'
-        AND   lineitem.suppkey = supplier.suppkey;
+    customer.custkey = orders.custkey
+    and lineitem.orderkey = orders.orderkey
+    and orders.totalprice > 460000.0
+    AND orders.orderdate >= '1994-01-01'
+    AND orders.orderdate <  '1995-01-01';

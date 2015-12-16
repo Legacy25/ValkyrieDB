@@ -281,13 +281,13 @@ Value* DoubleValueExpression::getValue() {
     return ConstantFP::get(doubleTy, data);
 }
 
-StringValueExpression::StringValueExpression(string* data){
+StringValueExpression::StringValueExpression(char* data){
     this->data = data;
 }
 
 Value* StringValueExpression::getValue() {
     Type* int64Ty = Type::getInt64Ty(getGlobalContext());
-    return ConstantInt::get(int64Ty, (uint64_t) data->c_str(), true);
+    return ConstantInt::get(int64Ty, (uint64_t) data, true);
 }
 
 Value* DateValueExpression::getValue() {

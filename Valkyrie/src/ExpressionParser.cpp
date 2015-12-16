@@ -60,7 +60,9 @@ BinaryExpression* ExpressionParser::arithmeticExpression(std::string s){
 
 Expression* ExpressionParser::leafExpression(std::string s){
 	if(s[0] == '\'' && s[s.length()-1] == '\''){
-		string* ns = new string(s.begin()+1, s.end()-1);
+		char* ns = new char[s.length()-1];
+		std::copy(s.begin()+1, s.end()-1, ns);
+		ns[s.length()-2] = '\0';
 		return new StringValueExpression(ns);
 		//add starts with date
 		//string expression
@@ -81,14 +83,22 @@ Expression* ExpressionParser::parseExpression(std::vector<std::string> tokens){
 	if(tokens.size() > 3 && tokens[tokens.size()-2] == "AS")
 		return parseExpression(std::vector<std::string>(tokens.begin(), tokens.end()-2));
 	for(int i = 0; i < tokens.size(); i++){
-		if(logicalOperators.find(tokens[i]) != logicalOperators.end() || 
-			arithmeticOperators.find(tokens[i]) != arithmeticOperators.end()){
+		if(logicalOperators.find(tokens[i]) != logicalOperators.end()){
 			Expression *left = parseExpression(std::vector<std::string>(tokens.begin(), tokens.begin()+i));
 			Expression *right = parseExpression(std::vector<std::string>(tokens.begin()+i+1, tokens.end()));
 			BinaryExpression *op = NULL;
-			if(arithmeticOperators.find(tokens[i]) != arithmeticOperators.end())
-				op = arithmeticExpression(tokens[i]);
-			else op = logicalExpression(tokens[i]);
+			op = logicalExpression(tokens[i]);
+			op->setLeftExpression(left);
+			op->setRightExpression(right);
+			return op;
+		}
+	}
+	for(int i = 0; i < tokens.size(); i++){
+		if(arithmeticOperators.find(tokens[i]) != arithmeticOperators.end()){
+			Expression *left = parseExpression(std::vector<std::string>(tokens.begin(), tokens.begin()+i));
+			Expression *right = parseExpression(std::vector<std::string>(tokens.begin()+i+1, tokens.end()));
+			BinaryExpression *op = NULL;
+			op = arithmeticExpression(tokens[i]);
 			op->setLeftExpression(left);
 			op->setRightExpression(right);
 			return op;
