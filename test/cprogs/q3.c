@@ -9,7 +9,7 @@ void handle_error(char* err_mesg, int exit_code) {
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        handle_error("Usage: q1 <path/to/data>", -1);
+        handle_error("Usage: q3 <path/to/data>", -1);
     }
 
     char* tablename = "lineitem";

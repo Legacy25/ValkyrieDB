@@ -104,6 +104,7 @@ namespace valkyrie{
     private:
     public:
         virtual Value* getValue() = 0;
+        ExprType getType(){ return ExprType::LOGEXPRESSION; }
     };
 
     // Base class of all comparison expressions
@@ -119,6 +120,7 @@ namespace valkyrie{
     private:
     public:
         Value* getValue();
+        ExprType getType(){ return ExprType::ADDITIONEXPRESSION; }
         string toString(){return this->leftExpression->toString() + " + " + this->rightExpression->toString();}
     };
 
@@ -126,6 +128,7 @@ namespace valkyrie{
     private:
     public:
         Value* getValue();
+        ExprType getType(){ return ExprType::SUBTRACTIONEXPRESSION; }
         string toString(){return this->leftExpression->toString() + " - " + this->rightExpression->toString();}
     };
 
@@ -133,6 +136,7 @@ namespace valkyrie{
     private:
     public:
         Value* getValue();
+        ExprType getType(){ return ExprType::MULTIPLICATIONEXPRESSION; }
         string toString(){return this->leftExpression->toString() + " * " + this->rightExpression->toString();}
     };
 
@@ -140,6 +144,7 @@ namespace valkyrie{
     private:
     public:
         Value* getValue();
+        ExprType getType(){ return ExprType::DIVISIONEXPRESSION; }
         string toString(){return this->leftExpression->toString() + " / " + this->rightExpression->toString();}
     };
 
@@ -148,6 +153,7 @@ namespace valkyrie{
     private:
     public:
         Value* getValue();
+        ExprType getType(){ return ExprType::ANDEXPRESSION; }
         string toString(){return this->leftExpression->toString() + " AND " + this->rightExpression->toString();}
     };
 
@@ -155,6 +161,7 @@ namespace valkyrie{
     private:
     public:
         Value* getValue();
+        ExprType getType(){ return ExprType::OREXPRESSION; }
         string toString(){return this->leftExpression->toString() + " OR " + this->rightExpression->toString();}
     };
 
@@ -171,6 +178,7 @@ namespace valkyrie{
     private:
     public:
         Value* getValue();
+        ExprType getType(){ return ExprType::NOTEQUALEXPRESSION; }
         string toString(){return this->leftExpression->toString() + " <> " + this->rightExpression->toString();}
     };
 
@@ -178,6 +186,7 @@ namespace valkyrie{
     private:
     public:
         Value* getValue();
+        ExprType getType(){ return ExprType::LESSTHANEXPRESSION; }
         string toString(){return this->leftExpression->toString() + " < " + this->rightExpression->toString();}
     };
 
@@ -185,6 +194,7 @@ namespace valkyrie{
     private:
     public:
         Value* getValue();
+        ExprType getType(){ return ExprType::LESSTHANEQUALEXPRESSION; }
         string toString(){return this->leftExpression->toString() + " <= " + this->rightExpression->toString();}
     };
 
@@ -200,6 +210,7 @@ namespace valkyrie{
     private:
     public:
         Value* getValue();
+        ExprType getType(){ return ExprType::GREATERTHANEQUALEXPRESSION; }
         string toString(){return this->leftExpression->toString() + " >= " + this->rightExpression->toString();}
     };
 
@@ -239,6 +250,7 @@ namespace valkyrie{
         string* getData();
         void setData(string*);
         Value* getValue();
+        ExprType getType(){ return ExprType::STRINGVALUEEXPRESSION; }
         string toString(){return *data;}
     };
 
@@ -250,6 +262,7 @@ namespace valkyrie{
         string* getData();
         void setData(string*);
         Value* getValue();
+        ExprType getType(){ return ExprType::DATEVALUEEXPRESSION; }
         string toString(){return *data;}
     };
 
