@@ -287,7 +287,7 @@ StringValueExpression::StringValueExpression(string* data){
 
 Value* StringValueExpression::getValue() {
     Type* int64Ty = Type::getInt64Ty(getGlobalContext());
-    return ConstantInt::get(int64Ty, (uint64_t) data, true);
+    return ConstantInt::get(int64Ty, (uint64_t) data->c_str(), true);
 }
 
 Value* DateValueExpression::getValue() {
